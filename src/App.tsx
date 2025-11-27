@@ -1,12 +1,17 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import FloatingLines from './components/background/FloatingLines'
 import Navbar from './components/navbar/Navbar'
-import Hero from './components/hero/Hero'
-import ContentSections from './components/sections/ContentSections'
 import Footer from './components/footer/Footer'
+import Home from './public/home/Home'
+import Events from './public/events/Events'
+import Competitions from './public/competitions/Competitions'
+import CCP from './public/ccp/CCP'
+import Join from './public/join/Join'
+import Contact from './public/contact/Contact'
 
 function App() {
   return (
-    <>
+    <BrowserRouter>
       <Navbar />
       <div style={{ position: 'relative', width: '100%', minHeight: '100vh' }}>
         {/* Background layer - behind everything */}
@@ -24,12 +29,20 @@ function App() {
 
         {/* Content layer - on top with transparent backgrounds */}
         <div style={{ position: 'relative', zIndex: 1, pointerEvents: 'none' }}>
-          <div style={{ pointerEvents: 'auto' }}><Hero /></div>
-          <div style={{ pointerEvents: 'auto' }}><ContentSections /></div>
+          <div style={{ pointerEvents: 'auto' }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/competitions" element={<Competitions />} />
+              <Route path="/ccp" element={<CCP />} />
+              <Route path="/join" element={<Join />} />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
+          </div>
           <div style={{ pointerEvents: 'auto' }}><Footer /></div>
         </div>
       </div>
-    </>
+    </BrowserRouter>
   )
 }
 

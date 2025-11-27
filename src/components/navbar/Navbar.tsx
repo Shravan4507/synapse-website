@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './Navbar.css'
 import logoImage from '../../assets/logos/logo.png'
 
@@ -8,15 +9,16 @@ type NavItem = {
 }
 
 const navItems: NavItem[] = [
-    { label: 'Home', href: '#home' },
-    { label: 'Events', href: '#events' },
-    { label: 'Competitions', href: '#competitions' },
-    { label: 'CCP', href: '#ccp' },
-    { label: 'Join', href: '#join' },
-    { label: 'Contact', href: '#contact' }
+    { label: 'Home', href: '/' },
+    { label: 'Events', href: '/events' },
+    { label: 'Competitions', href: '/competitions' },
+    { label: 'CCP', href: '/ccp' },
+    { label: 'Join', href: '/join' },
+    { label: 'Contact', href: '/contact' }
 ]
 
 export default function Navbar() {
+    const navigate = useNavigate()
     const [scrolled, setScrolled] = useState(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -49,10 +51,14 @@ export default function Navbar() {
     const handleNavClick = (href: string) => {
         closeMobileMenu()
         if (href.startsWith('#')) {
+            // Scroll to element on current page
             const element = document.querySelector(href)
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth' })
             }
+        } else if (href.startsWith('/')) {
+            // Navigate to route
+            navigate(href)
         } else {
             window.location.href = href
         }
