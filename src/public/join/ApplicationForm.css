@@ -5,13 +5,12 @@
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0);
-    margin-top: 3rem;
     backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    padding: 2rem;
+    padding: 3rem;
     overflow-y: auto;
     animation: fadeIn 0.3s ease-out;
 }
@@ -30,12 +29,14 @@
     background: rgba(20, 20, 30, 0.714);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 24px;
+    margin-top: 80rem;
     padding: 3rem;
     max-width: 700px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    position: relative;
+    position: fixed;
+    scroll-behavior: smooth;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     animation: slideUp 0.4s ease-out;
 }
