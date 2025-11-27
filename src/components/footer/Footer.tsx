@@ -1,4 +1,5 @@
 import './Footer.css'
+import footerLogo from '../../assets/logos/Logo Without Background - 1.png'
 
 export default function Footer() {
     return (
@@ -6,7 +7,7 @@ export default function Footer() {
             <div className="footer-container">
                 <div className="footer-column footer-brand">
                     <img
-                        src="/src/assets/logos/Logo Without Background - 1.png"
+                        src={footerLogo}
                         alt="Synapse"
                         onClick={() => window.location.reload()}
                         style={{
