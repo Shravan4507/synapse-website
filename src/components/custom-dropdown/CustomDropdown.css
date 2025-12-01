@@ -1,0 +1,106 @@
+.custom-dropdown-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.dropdown-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.dropdown-label .required {
+    color: #ff5555;
+    margin-left: 4px;
+}
+
+.dropdown-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.dropdown-trigger:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.dropdown-trigger.open {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.dropdown-trigger.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.dropdown-value {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+}
+
+.dropdown-placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.95rem;
+}
+
+.dropdown-arrow {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    transition: transform 0.3s ease;
+}
+
+.dropdown-arrow.up {
+    transform: rotate(180deg);
+}
+
+.dropdown-arrow.down {
+    transform: rotate(0deg);
+}
+
+.dropdown-list-container {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: none;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-animated-list .scroll-list-container {
+    width: 100%;
+}
+
+.dropdown-animated-list .scroll-list {
+    padding: 8px;
+    max-height: inherit;
+}
+
+.dropdown-item {
+    padding: 12px;
+    font-size: 0.9rem;
+}
+
+.dropdown-item .item-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}

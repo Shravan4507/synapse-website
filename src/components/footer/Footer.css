@@ -63,23 +63,8 @@
     font-size: 0.95rem;
 }
 
-.footer-column a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #00d4ff, #ff00ff);
-    transition: width 0.3s ease;
-}
-
 .footer-column a:hover {
     color: rgba(255, 255, 255, 1);
-}
-
-.footer-column a:hover::after {
-    width: 100%;
 }
 
 .footer-brand p {

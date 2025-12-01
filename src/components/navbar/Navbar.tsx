@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { logout, isAuthenticated } from '../../utils/auth'
 import './Navbar.css'
 import logoImage from '../../assets/logos/logo.png'
 
@@ -21,6 +22,25 @@ export default function Navbar() {
     const navigate = useNavigate()
     const [scrolled, setScrolled] = useState(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+    // Check if user is logged in
+    useEffect(() => {
+        const checkLoginStatus = () => {
+            setIsLoggedIn(isAuthenticated())
+        }
+
+        checkLoginStatus()
+        // Listen for storage changes (when user logs in/out in another tab)
+        window.addEventListener('storage', checkLoginStatus)
+        // Listen for userAuthChanged event (same-tab changes)
+        window.addEventListener('userAuthChanged', checkLoginStatus)
+
+        return () => {
+            window.removeEventListener('storage', checkLoginStatus)
+            window.removeEventListener('userAuthChanged', checkLoginStatus)
+        }
+    }, [])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -64,6 +84,17 @@ export default function Navbar() {
         }
     }
 
+    const handleAuthClick = () => {
+        if (isLoggedIn) {
+            // Logout using centralized utility
+            logout()
+            navigate('/user-login')
+        } else {
+            // Navigate to login
+            navigate('/user-login')
+        }
+    }
+
     return (
         <nav className="navbar-container">
             <div className={`navbar-inner ${scrolled ? 'scrolled' : ''}`}>
@@ -89,10 +120,10 @@ export default function Navbar() {
 
                 {/* Desktop Auth Button */}
                 <button
-                    className="navbar-cta desktop-only"
-                    onClick={() => handleNavClick('#login')}
+                    className={`navbar-cta desktop-only ${isLoggedIn ? 'logout' : ''}`}
+                    onClick={handleAuthClick}
                 >
-                    Login
+                    {isLoggedIn ? 'Logout' : 'Login'}
                 </button>
 
                 {/* Mobile Hamburger */}
@@ -122,10 +153,10 @@ export default function Navbar() {
                                 </button>
                             ))}
                             <button
-                                onClick={() => handleNavClick('#login')}
-                                className="mobile-menu-link cta"
+                                onClick={handleAuthClick}
+                                className={`mobile-menu-link cta ${isLoggedIn ? 'logout' : ''}`}
                             >
-                                Login
+                                {isLoggedIn ? 'Logout' : 'Login'}
                             </button>
                         </div>
                     </div>

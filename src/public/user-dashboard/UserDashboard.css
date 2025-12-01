@@ -1,0 +1,437 @@
+/* ========================================
+   PAGE LAYOUT & POSITIONING
+   ======================================== */
+
+.dashboard-page {
+    min-height: 100vh;
+    padding: 100px 60px 40px;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+/* ========================================
+   SIDEBAR DIMENSIONS & POSITIONING
+   ======================================== */
+
+.dashboard-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    margin-top: 0px;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.dashboard-sidebar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    height: 100%;
+    width: 120%;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.095);
+    border-radius: 30px;
+    background: rgba(0, 0, 0, 0.122);
+    backdrop-filter: blur(12px);
+}
+
+/* ========================================
+   ADVERTISEMENT AREA
+   ======================================== */
+
+.advertisement-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.086);
+    border-radius: 20px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+}
+
+.advertisement-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 81, 255, 0.1));
+    pointer-events: none;
+}
+
+.advertisement-rotated-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    transform: rotate(-35deg);
+    text-align: center;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+   NAVIGATION BUTTONS
+   ======================================== */
+
+.sidebar-nav-btn {
+    background: rgba(240, 240, 240, 0);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    padding: 0.9rem 1.5rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.sidebar-nav-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 1);
+}
+
+.sidebar-nav-btn:active {
+    transform: scale(0.98);
+}
+
+/* ========================================
+   SYNAPSE ID DISPLAY
+   ======================================== */
+
+.synapse-id-display {
+    background: rgba(240, 240, 240, 0);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.synapse-id-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+
+/* ========================================
+   USER PROFILE SECTION
+   ======================================== */
+
+.user-profile-section {
+    background: rgba(240, 240, 240, 0);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 34px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: auto;
+    position: relative;
+}
+
+.user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(200, 200, 200, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.avatar-placeholder {
+    font-size: 0.5rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    line-height: 1.2;
+}
+
+.user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-menu-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    transition: all 0.2s ease;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.user-menu-btn:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 0.75rem);
+    background: rgba(0, 0, 0, 0.451);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    backdrop-filter: blur(30px);
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 120px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    animation: slideInFromRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: left center;
+}
+
+@keyframes slideInFromRight {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px) scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+.user-dropdown-menu button {
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.user-dropdown-menu button:active {
+    transform: scale(0.98);
+}
+
+/* ========================================
+   MAIN CONTENT AREA
+   ======================================== */
+
+.dashboard-main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ========================================
+   CONTENT CONTAINER STYLES
+   ======================================== */
+
+.content-container {
+    background: rgba(0, 0, 0, 0);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+    width: 97%;
+    max-width: 1200px;
+    min-width: 0;
+    height: 82vh;
+    max-height: 1200px;
+    min-height: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 5%;
+    padding-top: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 2rem;
+    padding-left: 2rem;
+    animation: fadeInContent 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInContent {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.792);
+    text-align: center;
+    margin: 0 0 1.5rem 0;
+}
+
+.content-placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+/* ========================================
+   WELCOME SECTION
+   ======================================== */
+
+.dashboard-welcome-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 3rem 2rem;
+    text-align: center;
+    gap: 2rem;
+}
+
+.welcome-message {
+    margin-bottom: 1rem;
+}
+
+.welcome-heading {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg,
+            rgba(138, 43, 226, 0.9),
+            rgba(0, 81, 255, 0.9),
+            rgba(52, 226, 43, 0.9));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+}
+
+.welcome-heading .text-type__cursor {
+    color: rgba(255, 255, 255, 0.8);
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.8);
+}
+
+.welcome-tagline {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 600px;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 1024px) {
+    .dashboard-page {
+        padding: 100px 20px 40px;
+        gap: 1.5rem;
+    }
+
+    .dashboard-sidebar {
+        width: 280px;
+    }
+
+    .advertisement-rotated-text {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-page {
+        flex-direction: column;
+        padding: 90px 15px 30px;
+    }
+
+    .dashboard-sidebar {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .advertisement-card {
+        height: 180px;
+    }
+
+    .advertisement-rotated-text {
+        font-size: 1.3rem;
+    }
+
+    .user-dropdown-menu {
+        right: auto;
+        left: 0;
+    }
+
+    .welcome-heading {
+        font-size: 2rem;
+    }
+
+    .welcome-tagline {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-nav-btn {
+        padding: 0.8rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .advertisement-card {
+        height: 160px;
+    }
+
+    .advertisement-rotated-text {
+        font-size: 1.1rem;
+    }
+
+    .dashboard-sidebar-container {
+        padding: 1rem;
+    }
+
+    .welcome-heading {
+        font-size: 1.5rem;
+    }
+
+    .welcome-tagline {
+        font-size: 1rem;
+    }
+
+    .dashboard-welcome-section {
+        padding: 2rem 1rem;
+        min-height: 50vh;
+    }
+}
