@@ -1,14 +1,48 @@
+import { useState } from 'react'
+import CustomDropdown from '../../components/custom-dropdown/CustomDropdown'
 import './Contact.css'
 
 export default function Contact() {
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        phone: '',
+        role: '',
+        subject: '',
+        message: ''
+    })
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target
+        setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleDropdownChange = (name: string, value: string) => {
+        setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        alert('Thank you for contacting us! We will get back to you soon.')
+        // Reset form
+        setFormData({
+            fullName: '',
+            email: '',
+            phone: '',
+            role: '',
+            subject: '',
+            message: ''
+        })
+    }
+
     const contactInfo = {
         email: 'synapse@zcoer.edu.in',
-        phone: '+91 XXXX-XXXXXX', // Update when available
+        phone: '+91 XXXX-XXXXXX',
         social: {
             instagram: 'https://www.instagram.com/synapse.zcoer/',
-            linkedin: 'https://linkedin.com/company/synapse', // Update when available
-            twitter: 'https://twitter.com/synapse', // Update when available
-            facebook: 'https://facebook.com/synapse' // Update when available
+            linkedin: 'https://linkedin.com/company/synapse',
+            twitter: 'https://twitter.com/synapse',
+            facebook: 'https://facebook.com/synapse'
         },
         location: {
             name: 'Zeal College of Engineering & Research',
@@ -23,22 +57,107 @@ export default function Contact() {
                 <p className="contact-subtitle">We'd love to hear from you!</p>
 
                 <div className="contact-content">
-                    {/* Left: Google Form */}
+                    {/* Left: Custom Contact Form */}
                     <div className="contact-form-section">
                         <h2 className="section-heading">Send us a Message</h2>
-                        <div className="form-container">
-                            <iframe
-                                src="https://docs.google.com/forms/d/e/1FAIpQLScgJxQI6pcXsSBVlUlC54GlFRxjlOjIPg1dU_oxdhQkoC2Ryw/viewform?embedded=true"
-                                width="100%"
-                                height="1500"
-                                frameBorder="0"
-                                marginHeight={0}
-                                marginWidth={0}
-                                title="Contact Form"
-                            >
-                                Loading…
-                            </iframe>
-                        </div>
+                        <form className="custom-contact-form" onSubmit={handleSubmit}>
+                            {/* Full Name */}
+                            <div className="form-group">
+                                <label htmlFor="fullName">Full Name</label>
+                                <input
+                                    type="text"
+                                    id="fullName"
+                                    name="fullName"
+                                    value={formData.fullName}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your full name"
+                                />
+                            </div>
+
+                            {/* Email */}
+                            <div className="form-group">
+                                <label htmlFor="email">Email Address <span className="required">*</span></label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="your.email@example.com"
+                                    required
+                                />
+                            </div>
+
+                            {/* Phone Number */}
+                            <div className="form-group">
+                                <label htmlFor="phone">Phone Number</label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    placeholder="10-digit mobile number"
+                                />
+                            </div>
+
+                            {/* I am a... */}
+                            <div className="form-group">
+                                <CustomDropdown
+                                    label="I am a..."
+                                    placeholder="Select your role"
+                                    options={['Student', 'Faculty Member', 'Alumni', 'External Organization/Company']}
+                                    value={formData.role}
+                                    onChange={(value) => handleDropdownChange('role', value)}
+                                    name="role"
+                                    required
+                                    maxHeight="280px"
+                                />
+                            </div>
+
+                            {/* Subject */}
+                            <div className="form-group">
+                                <CustomDropdown
+                                    label="Subject"
+                                    placeholder="Select a subject"
+                                    options={[
+                                        'General Inquiry',
+                                        'Event Registration/Information',
+                                        'Competition Information',
+                                        'Partnership/Collaboration',
+                                        'Join Team Synapse',
+                                        'Technical Support',
+                                        'Feedback/Suggestions',
+                                        'Media/Press Inquiry',
+                                        'Sponsorship Inquiry'
+                                    ]}
+                                    value={formData.subject}
+                                    onChange={(value) => handleDropdownChange('subject', value)}
+                                    name="subject"
+                                    required
+                                    maxHeight="300px"
+                                />
+                            </div>
+
+                            {/* Message */}
+                            <div className="form-group">
+                                <label htmlFor="message">Your Message <span className="required">*</span></label>
+                                <textarea
+                                    id="message"
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleInputChange}
+                                    placeholder="Please provide details about your inquiry"
+                                    rows={6}
+                                    required
+                                />
+                            </div>
+
+                            {/* Submit Button */}
+                            <button type="submit" className="contact-submit-btn">
+                                Send Message
+                            </button>
+                        </form>
                     </div>
 
                     {/* Right: Contact Information */}

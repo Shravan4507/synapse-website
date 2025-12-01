@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import CustomDropdown from '../../components/custom-dropdown/CustomDropdown'
 import './ApplicationForm.css'
 
 interface ApplicationFormProps {
@@ -58,7 +59,7 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
         }
     }, [])
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
 
         if (name === 'division') {
@@ -72,6 +73,10 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
         } else {
             setFormData(prev => ({ ...prev, [name]: value }))
         }
+    }
+
+    const handleDropdownChange = (name: string, value: string) => {
+        setFormData(prev => ({ ...prev, [name]: value }))
     }
 
     const handleSameAsContact = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,7 +103,6 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        console.log('Form submitted:', formData)
         alert('Application submitted successfully!')
         onClose()
     }
@@ -211,34 +215,29 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
                         </div>
 
                         <div className="form-field">
-                            <label>Department <span className="required">*</span></label>
-                            <select
-                                name="department"
+                            <CustomDropdown
+                                label="Department"
+                                placeholder="Select Department"
+                                options={beDepartments}
                                 value={formData.department}
-                                onChange={handleInputChange}
+                                onChange={(value) => handleDropdownChange('department', value)}
+                                name="department"
                                 required
-                            >
-                                <option value="">Select Department</option>
-                                {beDepartments.map(dept => (
-                                    <option key={dept} value={dept}>{dept}</option>
-                                ))}
-                            </select>
+                                maxHeight="300px"
+                            />
                         </div>
 
                         <div className="form-field">
-                            <label>Class <span className="required">*</span></label>
-                            <select
-                                name="class"
+                            <CustomDropdown
+                                label="Class"
+                                placeholder="Select Class"
+                                options={['FY', 'SY', 'TE', 'BE']}
                                 value={formData.class}
-                                onChange={handleInputChange}
+                                onChange={(value) => handleDropdownChange('class', value)}
+                                name="class"
                                 required
-                            >
-                                <option value="">Select Class</option>
-                                <option value="FY">FY</option>
-                                <option value="SY">SY</option>
-                                <option value="TE">TE</option>
-                                <option value="BE">BE</option>
-                            </select>
+                                maxHeight="250px"
+                            />
                         </div>
 
                         <div className="form-field">
@@ -284,17 +283,16 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
                         <h3 className="section-heading">Role</h3>
 
                         <div className="form-field">
-                            <label>Select Role <span className="required">*</span></label>
-                            <select
-                                name="role"
+                            <CustomDropdown
+                                label="Select Role"
+                                placeholder="Select Role"
+                                options={['Apply for Core Team', 'Apply as Volunteer']}
                                 value={formData.role}
-                                onChange={handleInputChange}
+                                onChange={(value) => handleDropdownChange('role', value)}
+                                name="role"
                                 required
-                            >
-                                <option value="">Select Role</option>
-                                <option value="core">Apply for Core Team</option>
-                                <option value="volunteer">Apply as Volunteer</option>
-                            </select>
+                                maxHeight="200px"
+                            />
                         </div>
                     </section>
 
