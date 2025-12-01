@@ -43,7 +43,7 @@
 
 .advertisement-card {
     background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.086);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 20px;
     height: 220px;
     display: flex;
@@ -61,7 +61,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 81, 255, 0.1));
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 81, 255, 0.2));
     pointer-events: none;
 }
 
