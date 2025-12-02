@@ -23,8 +23,8 @@
 }
 
 /* Common styles */
-.section-title {
-    font-size: 3rem;
+.content-section-title {
+    font-size: 4.7rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
     line-height: 1.2;
@@ -244,7 +244,7 @@
         transform: none;
     }
 
-    .section-title {
+    .content-section-title {
         font-size: 2.5rem;
     }
 }
@@ -255,7 +255,7 @@
         min-height: auto;
     }
 
-    .section-title {
+    .content-section-title {
         font-size: 2rem;
         margin-bottom: 1rem;
     }
@@ -284,7 +284,7 @@
         padding: 2rem 1rem;
     }
 
-    .section-title {
+    .content-section-title {
         font-size: 1.7rem;
     }
 

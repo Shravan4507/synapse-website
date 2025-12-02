@@ -141,7 +141,7 @@ export default function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps)
                 <div className="profile-content">
                     {/* Personal Details Section */}
                     <div className="profile-section">
-                        <h3 className="section-title">Personal Details</h3>
+                        <h3 className="profile-section-title">Personal Details</h3>
 
                         {/* Full Name */}
                         <div className="profile-field">
@@ -244,7 +244,7 @@ export default function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps)
 
                     {/* Academic Details Section */}
                     <div className="profile-section">
-                        <h3 className="section-title">Academic Details</h3>
+                        <h3 className="profile-section-title">Academic Details</h3>
 
                         {/* College */}
                         <div className="profile-field">
@@ -315,7 +315,7 @@ export default function ProfileOverlay({ isOpen, onClose }: ProfileOverlayProps)
 
                     {/* Account Details Section */}
                     <div className="profile-section">
-                        <h3 className="section-title">Account Details</h3>
+                        <h3 className="profile-section-title">Account Details</h3>
 
                         {/* Email (Read-only) */}
                         <div className="profile-field">

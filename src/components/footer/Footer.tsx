@@ -1,7 +1,24 @@
+import { useNavigate } from 'react-router-dom'
+import { getCurrentUser } from '../../utils/auth'
 import './Footer.css'
 import footerLogo from '../../assets/logos/Logo Without Background - 1.png'
 
 export default function Footer() {
+    const navigate = useNavigate()
+    const isLoggedIn = !!getCurrentUser()
+
+    const handleNavigation = (path: string) => {
+        navigate(path)
+    }
+
+    const handleLoginClick = (e: React.MouseEvent) => {
+        if (isLoggedIn) {
+            e.preventDefault()
+            return
+        }
+        navigate('/user-login')
+    }
+
     return (
         <footer className="footer">
             <div className="footer-container">
@@ -23,37 +40,54 @@ export default function Footer() {
                 <div className="footer-column">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#events">Events</a></li>
-                        <li><a href="#competitions">Competitions</a></li>
-                        <li><a href="#ccp">CCP</a></li>
+                        <li><a onClick={() => handleNavigation('/')}>Home</a></li>
+                        <li><a onClick={() => handleNavigation('/events')}>Events</a></li>
+                        <li><a onClick={() => handleNavigation('/competitions')}>Competitions</a></li>
+                        <li><a onClick={() => handleNavigation('/ccp')}>CCP</a></li>
                     </ul>
                 </div>
 
                 <div className="footer-column">
                     <h4>Get Involved</h4>
                     <ul>
-                        <li><a href="#join">Join the Team</a></li>
-                        <li><a href="#contact">Contact Us</a></li>
-                        <li><a href="#login">Login</a></li>
+                        <li><a onClick={() => handleNavigation('/join')}>Join the Team</a></li>
+                        <li><a onClick={() => handleNavigation('/contact')}>Contact Us</a></li>
+                        <li>
+                            <a
+                                onClick={handleLoginClick}
+                                className={isLoggedIn ? 'disabled-link' : ''}
+                                style={{
+                                    cursor: isLoggedIn ? 'not-allowed' : 'pointer',
+                                    opacity: isLoggedIn ? 0.5 : 1
+                                }}
+                            >
+                                Login
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
                 <div className="footer-column">
                     <h4>Connect</h4>
                     <ul>
-                        <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a></li>
-                        <li><a href="https://youtube.com" target="_blank" rel="noopener noreferrer">YouTube</a></li>
-                        <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-                        <li><a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a></li>
+                        <li><a href="https://instagram.com/synapse.zcoer" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                        <li><a href="mailto:contact@synapsefest.org">E-mail</a></li>
                     </ul>
                 </div>
 
                 <div className="footer-column">
-                    <h4>Contact</h4>
-                    <p><a href="mailto:contact@synapsefest.in">contact@synapsefest.in</a></p>
-                    <p>ZCOER, Narhe, Pune</p>
-                    <p>Maharashtra, India</p>
+                    <h4>Location</h4>
+                    <p>
+                        <a
+                            href="https://maps.app.goo.gl/zr4Yg3uhrYabnjH49"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="location-link"
+                        >
+                            Zeal College of Engineering and Research<br />
+                            Survey No-39, Dhayari Narhe Rd, Narhe, Pune, Maharashtra 411041
+                        </a>
+                    </p>
                 </div>
             </div>
 

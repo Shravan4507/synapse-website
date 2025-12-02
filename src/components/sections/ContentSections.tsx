@@ -6,7 +6,7 @@ export default function ContentSections() {
             {/* What is Synapse? */}
             <section className="section section-what-synapse">
                 <div className="section-content-left">
-                    <h2 className="section-title"><span className="title-prefix">What is<br /></span><span className="title-cursive">Synapse?</span></h2>
+                    <h2 className="content-section-title"><span className="title-prefix">What is<br /></span><span className="title-cursive">Synapse?</span></h2>
                     <div className="section-text">
                         <p>Synapse is the official annual technical festival of ZCOER — a platform where innovation, engineering, creativity, and student energy collide to create something far beyond a traditional college fest.</p>
                         <p>Built around the idea of connection, Synapse represents the spark that forms when minds, machines, and ideas link together. It is a celebration of technology in its purest and wildest form — where students don't just learn, they experiment, build, compete, collaborate, showcase, and lead.</p>
@@ -29,7 +29,7 @@ export default function ContentSections() {
                     </div>
                 </div>
                 <div className="section-content-right">
-                    <h2 className="section-title"><span className="title-prefix">Why<br /></span><span className="title-cursive">Synapse?</span></h2>
+                    <h2 className="content-section-title"><span className="title-prefix">Why<br /></span><span className="title-cursive">Synapse?</span></h2>
                     <div className="section-text">
                         <p>Synapse isn't just another technical festival — it's a gateway to the future.</p>
                         <p>Built on the idea of connection, creativity, and cutting-edge innovation, Synapse brings students face-to-face with the technologies shaping tomorrow. It's where ideas evolve into prototypes, skills sharpen into achievements, and passion transforms into real-world impact.</p>
@@ -45,7 +45,7 @@ export default function ContentSections() {
             {/* What is CCP? */}
             <section className="section section-what-ccp">
                 <div className="section-content-diagonal">
-                    <h2 className="section-title"><span className="title-prefix">What is<br /></span><span className="title-cursive">CCP?</span></h2>
+                    <h2 className="content-section-title"><span className="title-prefix">What is<br /></span><span className="title-cursive">CCP?</span></h2>
                     <div className="section-text">
                         <p>The College Connect Program is an outreach initiative by Synapse '26 designed to build strong, meaningful connections with colleges across Pune and surrounding regions.</p>
                         <p>Its goal is simple: bring students from different institutes together under one collaborative, innovative, and inspiring platform.</p>
@@ -69,7 +69,7 @@ export default function ContentSections() {
                     </div>
                 </div>
                 <div className="section-content-right-alt">
-                    <h2 className="section-title"><span className="title-prefix">Why<br /></span><span className="title-cursive">CCP?</span></h2>
+                    <h2 className="content-section-title"><span className="title-prefix">Why<br /></span><span className="title-cursive">CCP?</span></h2>
                     <div className="section-text">
                         <p>The College Connect Program exists to open the doors of Synapse far beyond ZCOER.</p>
                         <p>It gives students from different colleges a chance to experience the energy, innovation, and opportunities that Synapse offers — while building a stronger, wider tech community.</p>

@@ -61,10 +61,33 @@
     transition: all 0.3s ease;
     position: relative;
     font-size: 0.95rem;
+    cursor: pointer;
 }
 
 .footer-column a:hover {
     color: rgba(255, 255, 255, 1);
+}
+
+.footer-column a:active {
+    transform: scale(0.98);
+}
+
+.footer-column a.disabled-link {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.footer-column a.disabled-link:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.location-link {
+    display: block;
+    line-height: 1.6;
+}
+
+.location-link:active {
+    transform: scale(0.98);
 }
 
 .footer-brand p {

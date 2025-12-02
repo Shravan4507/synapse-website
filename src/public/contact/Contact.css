@@ -6,6 +6,11 @@
 .contact-container {
     max-width: 1400px;
     margin: 0 auto;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 34px;
+    padding: 2rem;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .contact-title {
@@ -184,11 +189,11 @@
     text-decoration: none;
     display: block;
     line-height: 1.6;
+    transition: all 0.2s ease;
 }
 
-a.info-value:hover {
-    color: #fff;
-    text-decoration: underline;
+.info-value:active {
+    transform: scale(0.99);
 }
 
 /* Social Media */
@@ -221,10 +226,8 @@ a.info-value:hover {
     height: 20px;
 }
 
-.social-link:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.15);
-    color: #fff;
+.social-link:active {
+    transform: scale(0.95);
 }
 
 /* Responsive */
