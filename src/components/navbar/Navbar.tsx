@@ -153,7 +153,10 @@ export default function Navbar() {
                                 </button>
                             ))}
                             <button
-                                onClick={handleAuthClick}
+                                onClick={() => {
+                                    closeMobileMenu()
+                                    handleAuthClick()
+                                }}
                                 className={`mobile-menu-link cta ${isLoggedIn ? 'logout' : ''}`}
                             >
                                 {isLoggedIn ? 'Logout' : 'Login'}

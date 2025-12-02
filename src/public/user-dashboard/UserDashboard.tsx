@@ -40,9 +40,9 @@ export default function UserDashboard() {
             <div className="dashboard-sidebar">
                 {/* Sidebar Container wrapping all sidebar elements */}
                 <div className="dashboard-sidebar-container">
-                    {/* Advertisement Area Card */}
-                    <div className="advertisement-card">
-                        <div className="advertisement-rotated-text">Advertisement Area</div>
+                    {/* Promotional Space Card */}
+                    <div className="promotional-space-card">
+                        <div className="promotional-space-rotated-text">Promotional Space</div>
                     </div>
 
                     {/* Navigation Buttons */}

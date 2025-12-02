@@ -14,7 +14,7 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    z-index: 45;
+    z-index: 50;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
     /* Water droplet slide-in animation from right */
@@ -120,7 +120,8 @@
 
 @media (max-width: 768px) {
     .user-dashboard-button {
-        top: 1rem;
+        top: 85px;
+        z-index: 50;
         right: 1rem;
         width: 60px;
         height: 60px;
