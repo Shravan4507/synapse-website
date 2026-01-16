@@ -16,21 +16,33 @@ const firebaseConfig = {
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 }
 
+// Validate that required Firebase config is present
+const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'appId'] as const
+const missingKeys = requiredKeys.filter(key => !firebaseConfig[key])
+
+if (missingKeys.length > 0) {
+    console.error('❌ Missing Firebase configuration:', missingKeys.join(', '))
+    console.error('Make sure these environment variables are set:')
+    missingKeys.forEach(key => {
+        const envVar = `VITE_FIREBASE_${key.replace(/([A-Z])/g, '_$1').toUpperCase()}`
+        console.error(`  - ${envVar}`)
+    })
+    throw new Error(`Firebase configuration incomplete. Missing: ${missingKeys.join(', ')}`)
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
 
-// Initialize Firebase App Check for security
-// This helps protect your backend from abuse by verifying requests come from your app
-// Note: You need to set up reCAPTCHA v3 in Firebase Console and add the site key to env
+// Initialize Firebase App Check for security (optional - only if reCAPTCHA key is provided)
 if (typeof window !== 'undefined' && import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
     try {
         initializeAppCheck(app, {
             provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-            isTokenAutoRefreshEnabled: true // Automatically refresh App Check token
+            isTokenAutoRefreshEnabled: true
         })
-        console.warn('SUCCESS: Firebase App Check initialized correctly!')
+        console.info('✅ Firebase App Check initialized')
     } catch (error) {
-        console.warn('App Check initialization failed:', error)
+        console.warn('⚠️ App Check initialization failed (non-critical):', error)
     }
 }
 
@@ -39,10 +51,14 @@ export const auth = getAuth(app)
 export const db = getFirestore(app)
 export const storage = getStorage(app)
 
-// Initialize Analytics (only in browser)
+// Initialize Analytics (only in browser, non-blocking)
 export const initAnalytics = async () => {
-    if (await isSupported()) {
-        return getAnalytics(app)
+    try {
+        if (await isSupported()) {
+            return getAnalytics(app)
+        }
+    } catch {
+        console.warn('⚠️ Analytics not supported in this environment')
     }
     return null
 }
