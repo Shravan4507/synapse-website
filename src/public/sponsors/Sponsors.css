@@ -1,0 +1,195 @@
+.sponsors-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 120px 2rem 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.sponsors-content {
+    text-align: center;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.sponsors-loading {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.1rem;
+    padding: 3rem;
+}
+
+/* ========================================
+   SPONSOR CATEGORIES
+   ======================================== */
+.sponsor-category {
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.category-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* ========================================
+   SPONSOR GRIDS
+   ======================================== */
+.sponsor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    justify-items: center;
+}
+
+/* ========================================
+   SPONSOR CARDS
+   ======================================== */
+.sponsor-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 280px;
+}
+
+.sponsor-card.clickable {
+    cursor: pointer;
+}
+
+.sponsor-card.clickable:active {
+    transform: scale(0.98);
+}
+
+.sponsor-image-container {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.sponsor-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+}
+
+.sponsor-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    text-align: center;
+}
+
+/* ========================================
+   BECOME A SPONSOR
+   ======================================== */
+.become-sponsor {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+}
+
+.become-sponsor h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.5rem;
+}
+
+.become-sponsor p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1.5rem;
+}
+
+.sponsor-cta-btn {
+    display: inline-block;
+    padding: 12px 32px;
+    background: rgba(255, 217, 0, 0);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 24px;
+    color: #ffd700;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.sponsor-cta-btn:active {
+    transform: scale(0.98);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 900px) {
+    .sponsor-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .sponsors-page {
+        padding: 100px 1rem 40px;
+    }
+
+    .category-title {
+        font-size: 1.25rem;
+    }
+
+    .sponsor-card {
+        max-width: 220px;
+        padding: 1.25rem;
+    }
+
+    .sponsor-image-container {
+        height: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sponsor-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sponsor-card {
+        max-width: 280px;
+    }
+}

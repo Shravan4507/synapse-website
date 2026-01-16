@@ -1,0 +1,112 @@
+rules_version = '2';
+
+// =============================================================================
+// FIREBASE STORAGE SECURITY RULES
+// =============================================================================
+// Protects uploaded files with:
+// 1. Authentication requirements
+// 2. File size limits
+// 3. Content type validation
+// 4. Path-based access control
+// =============================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // =================================
+    // HELPER FUNCTIONS
+    // =================================
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Validate file size (max 5MB)
+    function isValidFileSize() {
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+    
+    // Validate image content type
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    // =================================
+    // SPONSOR IMAGES
+    // =================================
+    match /sponsors/{allPaths=**} {
+      // Public read access
+      allow read: if true;
+      
+      // Only admins can upload sponsor images
+      allow create: if isAdmin() && isImage() && isValidFileSize();
+      allow update: if isAdmin() && isImage() && isValidFileSize();
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // PROMOTIONAL IMAGES
+    // =================================
+    match /promotions/{allPaths=**} {
+      // Public read access
+      allow read: if true;
+      
+      // Only admins can manage promotional images
+      allow create: if isAdmin() && isImage() && isValidFileSize();
+      allow update: if isAdmin() && isImage() && isValidFileSize();
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // PRODUCT IMAGES
+    // =================================
+    match /products/{allPaths=**} {
+      // Public read access
+      allow read: if true;
+      
+      // Only admins can manage product images
+      allow write: if isAdmin() && isImage() && isValidFileSize();
+    }
+    
+    // =================================
+    // EVENT IMAGES
+    // =================================
+    match /events/{allPaths=**} {
+      // Public read access
+      allow read: if true;
+      
+      // Only admins can manage event images
+      allow write: if isAdmin() && isImage() && isValidFileSize();
+    }
+    
+    // =================================
+    // USER PROFILE IMAGES
+    // =================================
+    match /users/{userId}/{allPaths=**} {
+      // Users can read their own files, admins can read all
+      allow read: if request.auth.uid == userId || isAdmin();
+      
+      // Users can upload their own profile images
+      allow create, update: if request.auth.uid == userId && 
+        isImage() && 
+        request.resource.size < 2 * 1024 * 1024; // 2MB limit for user uploads
+      
+      // Users can delete their own files
+      allow delete: if request.auth.uid == userId || isAdmin();
+    }
+    
+    // =================================
+    // DENY ALL OTHER ACCESS
+    // =================================
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

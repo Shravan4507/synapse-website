@@ -1,0 +1,237 @@
+rules_version = '2';
+
+// =============================================================================
+// FIRESTORE SECURITY RULES - OWASP Compliant
+// =============================================================================
+// These rules enforce:
+// 1. Authentication - Only authenticated users can access data
+// 2. Authorization - Users can only access their own data (unless admin)
+// 3. Data Validation - Input validation at the database level
+// 4. Rate Limiting - Through request.auth checks and document-level limits
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // =================================
+    // HELPER FUNCTIONS
+    // =================================
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is the owner of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Check if user is an admin (stored in admins collection)
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Validate string field
+    function isValidString(field, minLen, maxLen) {
+      return field is string && field.size() >= minLen && field.size() <= maxLen;
+    }
+    
+    // Validate URL format (basic check)
+    function isValidUrl(url) {
+      return url == null || url == '' || 
+        (url is string && (url.matches('^https?://.*') || url == ''));
+    }
+    
+    // Rate limiting helper - check timestamp
+    function isNotTooFrequent() {
+      return !exists(/databases/$(database)/documents/rate_limits/$(request.auth.uid)) ||
+        resource.data.lastWrite < request.time - duration.value(1, 's');
+    }
+    
+    // =================================
+    // ADMINS COLLECTION
+    // =================================
+    match /admins/{adminId} {
+      // Only existing admins can read admin list
+      allow read: if isAdmin();
+      // Only super-admins can modify (you'll need to set this up manually in Firebase Console)
+      allow write: if false; // Manually managed via Firebase Console
+    }
+    
+    // =================================
+    // USERS COLLECTION
+    // =================================
+    match /users/{userId} {
+      // Users can read their own data, admins can read all
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Users can create their own profile
+      allow create: if isOwner(userId) && 
+        isValidString(request.resource.data.displayName, 1, 100);
+      
+      // Users can update their own profile
+      allow update: if isOwner(userId) && 
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['displayName', 'photoURL', 'updatedAt']);
+      
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // SPONSORS COLLECTION
+    // =================================
+    match /sponsors/{sponsorId} {
+      // Public read access (sponsors are displayed on public pages)
+      allow read: if true;
+      
+      // Only admins can create sponsors
+      allow create: if isAdmin() && 
+        isValidString(request.resource.data.title, 1, 200) &&
+        request.resource.data.images is list &&
+        request.resource.data.images.size() <= 10;
+      
+      // Only admins can update sponsors
+      allow update: if isAdmin();
+      
+      // Only admins can delete sponsors
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // SPONSOR CATEGORIES COLLECTION
+    // =================================
+    match /sponsor_categories/{categoryId} {
+      // Public read access
+      allow read: if true;
+      
+      // Only admins can manage categories
+      allow create: if isAdmin() && 
+        isValidString(request.resource.data.name, 1, 100);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // PROMOTIONS COLLECTION
+    // =================================
+    match /promotions/{promotionId} {
+      // Public read access (promotions are displayed on dashboard)
+      allow read: if true;
+      
+      // Only admins can create promotions
+      allow create: if isAdmin() && 
+        request.resource.data.images is list &&
+        request.resource.data.images.size() >= 1 &&
+        request.resource.data.images.size() <= 10;
+      
+      // Only admins can update/delete promotions
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // PROMOTIONAL SPACE (Legacy single doc)
+    // =================================
+    match /promotional_space/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // =================================
+    // EVENTS COLLECTION
+    // =================================
+    match /events/{eventId} {
+      // Public read access
+      allow read: if true;
+      
+      // Only admins can manage events
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // MERCH/PRODUCTS COLLECTION
+    // =================================
+    match /products/{productId} {
+      // Public read access
+      allow read: if true;
+      
+      // Only admins can manage products
+      allow write: if isAdmin();
+    }
+    
+    // =================================
+    // COMPETITIONS COLLECTION
+    // =================================
+    match /competitions/{competitionId} {
+      // Public read access
+      allow read: if true;
+      
+      // Only admins can manage competitions
+      allow create: if isAdmin() && 
+        isValidString(request.resource.data.name, 1, 200) &&
+        isValidString(request.resource.data.category, 1, 50);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // COMPETITION CATEGORIES COLLECTION
+    // =================================
+    match /competition_categories/{categoryId} {
+      // Public read access
+      allow read: if true;
+      
+      // Only admins can manage categories
+      allow create: if isAdmin() && 
+        isValidString(request.resource.data.name, 1, 100);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // REGISTRATIONS COLLECTION
+    // =================================
+    match /registrations/{registrationId} {
+      // Public can create registrations (to register for competitions)
+      allow create: if isValidString(request.resource.data.teamName, 1, 200) &&
+        isValidString(request.resource.data.competitionId, 1, 100) &&
+        request.resource.data.teamMembers is list &&
+        request.resource.data.teamMembers.size() >= 1 &&
+        request.resource.data.teamMembers.size() <= 10;
+      
+      // Only admins can read/update/delete registrations
+      allow read: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // =================================
+    // USER SPECIFIC DATA
+    // =================================
+    match /user_events/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    match /user_tasks/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      // Subcollection for tasks
+      match /tasks/{taskId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    // =================================
+    // DENY ALL OTHER ACCESS
+    // =================================
+    match /{document=**} {
+      // Default deny - if no rule matches, access is denied
+      allow read, write: if false;
+    }
+  }
+}

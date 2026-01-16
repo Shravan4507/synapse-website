@@ -1,0 +1,263 @@
+.admin-panel {
+    width: 100%;
+}
+
+.admin-section {
+    margin-bottom: 1.5rem;
+}
+
+.admin-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Loading State */
+.admin-panel-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 3rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-top-color: rgba(138, 43, 226, 0.8);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty State */
+.admin-panel-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 3rem;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.admin-panel-empty p {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+}
+
+.empty-hint {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Management Pages Grid */
+.admin-management-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.admin-management-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(137, 43, 226, 0);
+    border: 1px solid rgba(138, 43, 226, 0.25);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-management-btn:active {
+    transform: scale(0.98);
+}
+
+.management-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.management-label {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: left;
+}
+
+.management-arrow {
+    font-size: 1.25rem;
+    color: rgba(138, 43, 226, 0.8);
+    transition: transform 0.2s ease;
+}
+
+.admin-management-btn:hover .management-arrow {
+    transform: translateX(4px);
+}
+
+/* Controls Grid */
+.admin-controls-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+/* Control Card */
+.admin-control-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.admin-control-card.active {
+    border-color: rgba(0, 200, 100, 0.3);
+    background: rgba(0, 200, 100, 0);
+}
+
+.admin-control-card.inactive {
+    border-color: rgba(255, 100, 100, 0.2);
+    background: rgba(255, 100, 100, 0);
+}
+
+.control-icon {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.control-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.control-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.control-description {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Toggle Button */
+.control-toggle {
+    position: relative;
+    width: 60px;
+    height: 32px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+}
+
+.control-toggle.on {
+    background: rgba(0, 200, 100, 0.8);
+    justify-content: flex-end;
+}
+
+.control-toggle.off {
+    background: rgba(100, 100, 100, 0.6);
+    justify-content: flex-start;
+}
+
+.control-toggle.updating {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.toggle-slider {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    left: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.control-toggle.on .toggle-slider {
+    left: calc(100% - 28px);
+}
+
+.toggle-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.5px;
+    z-index: 1;
+}
+
+.control-toggle:hover:not(:disabled) {
+    transform: scale(1);
+}
+
+.control-toggle:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .admin-controls-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-control-card {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+
+    .control-icon {
+        font-size: 1.5rem;
+    }
+
+    .control-label {
+        font-size: 0.9rem;
+    }
+
+    .control-toggle {
+        width: 52px;
+        height: 28px;
+    }
+
+    .toggle-slider {
+        width: 20px;
+        height: 20px;
+    }
+
+    .control-toggle.on .toggle-slider {
+        left: calc(100% - 24px);
+    }
+}

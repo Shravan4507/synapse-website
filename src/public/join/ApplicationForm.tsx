@@ -1,16 +1,22 @@
 import { useState, useEffect } from 'react'
 import CustomDropdown from '../../components/custom-dropdown/CustomDropdown'
+import { submitApplication } from '../../lib/applicationService'
 import './ApplicationForm.css'
 
 interface ApplicationFormProps {
     onClose: () => void
+    synapseId: string
+    userName: string
+    userEmail: string
+    userContact: string
+    userCollege: string
 }
 
-export default function ApplicationForm({ onClose }: ApplicationFormProps) {
+export default function ApplicationForm({ onClose, synapseId, userName, userEmail, userContact, userCollege }: ApplicationFormProps) {
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        contact: '',
+        name: userName || '',
+        email: userEmail || '',
+        contact: userContact || '',
         whatsapp: '',
         sameAsContact: false,
         zprnNumber: '',
@@ -22,6 +28,8 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
         skills: '',
         contribution: ''
     })
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [submitError, setSubmitError] = useState('')
 
     const beDepartments = [
         'Computer Engineering',
@@ -101,26 +109,64 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
         return text.trim().split(/\s+/).filter(word => word.length > 0).length
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        alert('Application submitted successfully!')
-        onClose()
-    }
+        setSubmitError('')
+        setIsSubmitting(true)
 
-    const handleOverlayClick = (e: React.MouseEvent) => {
-        if (e.target === e.currentTarget) {
-            onClose()
+        try {
+            const result = await submitApplication({
+                synapseId,
+                name: formData.name,
+                email: formData.email,
+                contact: formData.contact,
+                whatsapp: formData.whatsapp,
+                zprnNumber: formData.zprnNumber,
+                department: formData.department,
+                class: formData.class,
+                division: formData.division,
+                selectedTeams: formData.selectedTeams,
+                role: formData.role,
+                skills: formData.skills,
+                contribution: formData.contribution
+            })
+
+            if (result.success) {
+                alert('Application submitted successfully! We will get back to you soon.')
+                onClose()
+            } else {
+                setSubmitError(result.error || 'Failed to submit application')
+            }
+        } catch {
+            setSubmitError('Something went wrong. Please try again.')
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
     return (
-        <div className="form-overlay" onClick={handleOverlayClick}>
+        <div className="form-overlay">
             <div className="form-container">
                 <button className="form-close-btn" onClick={onClose}>×</button>
 
                 <h2 className="form-heading">Join Synapse Team</h2>
 
                 <form onSubmit={handleSubmit}>
+                    {/* Synapse ID - Read Only */}
+                    <section className="form-section">
+                        <h3 className="section-heading">Synapse Identity</h3>
+
+                        <div className="form-field">
+                            <label>Synapse ID</label>
+                            <input
+                                type="text"
+                                value={synapseId}
+                                readOnly
+                                className="readonly-input"
+                            />
+                        </div>
+                    </section>
+
                     {/* Personal Details */}
                     <section className="form-section">
                         <h3 className="section-heading">Personal Details</h3>
@@ -138,14 +184,13 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
                         </div>
 
                         <div className="form-field">
-                            <label>Email <span className="required">*</span></label>
+                            <label>Email</label>
                             <input
                                 type="email"
                                 name="email"
-                                placeholder="your.email@example.com"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                required
+                                value={userEmail}
+                                readOnly
+                                className="readonly-input-faded"
                             />
                         </div>
 
@@ -201,6 +246,16 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
                     {/* Academic Credentials */}
                     <section className="form-section">
                         <h3 className="section-heading">Academic Credentials</h3>
+
+                        <div className="form-field">
+                            <label>College</label>
+                            <input
+                                type="text"
+                                value={userCollege}
+                                readOnly
+                                className="readonly-input-faded"
+                            />
+                        </div>
 
                         <div className="form-field">
                             <label>ZPRN Number <span className="required">*</span></label>
@@ -335,8 +390,16 @@ export default function ApplicationForm({ onClose }: ApplicationFormProps) {
                         </div>
                     </section>
 
-                    <button type="submit" className="form-submit-btn">
-                        Submit Application
+                    {submitError && (
+                        <div className="form-error">{submitError}</div>
+                    )}
+
+                    <button
+                        type="submit"
+                        className="form-submit-btn"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? 'Submitting...' : 'Submit Application'}
                     </button>
                 </form>
             </div>

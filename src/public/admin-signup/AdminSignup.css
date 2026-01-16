@@ -1,0 +1,141 @@
+.admin-signup-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 60px;
+    backdrop-filter: blur(10px);
+}
+
+.admin-signup-container {
+    width: 100%;
+    max-width: 450px;
+}
+
+.admin-signup-card {
+    background: rgba(20, 20, 30, 0.5);
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.5s ease-out;
+    text-align: center;
+    position: relative;
+}
+
+.admin-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.9), rgba(100, 20, 180, 0.9));
+    color: white;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-signup-title {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.9), rgba(255, 255, 255, 0.9));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.admin-signup-subtitle {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 2.5rem;
+}
+
+.error-message {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 100, 100, 0.95);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.google-signin-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 24px;
+    background: rgba(138, 43, 226, 0.1);
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.google-signin-btn:hover {
+    background: rgba(138, 43, 226, 0.2);
+    border-color: rgba(138, 43, 226, 0.5);
+}
+
+.google-signin-btn:active {
+    transform: scale(0.98);
+}
+
+.google-signin-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.admin-signup-footer-text {
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .admin-signup-page {
+        padding: 100px 15px 40px;
+    }
+
+    .admin-signup-card {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .admin-signup-title {
+        font-size: 1.75rem;
+    }
+
+    .google-signin-btn {
+        font-size: 0.95rem;
+        padding: 12px 20px;
+    }
+}

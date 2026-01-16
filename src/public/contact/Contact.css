@@ -139,8 +139,30 @@
     margin-top: 0.5rem;
 }
 
-.contact-submit-btn:active {
+.contact-submit-btn:active:not(:disabled) {
     transform: scale(0.95);
+}
+
+.contact-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.contact-submit-btn.success {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.contact-submit-btn.error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.submit-success {
+    text-align: center;
+    color: #22c55e;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
 }
 
 /* Contact Info Section */

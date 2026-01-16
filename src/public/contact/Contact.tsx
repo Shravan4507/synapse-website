@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import CustomDropdown from '../../components/custom-dropdown/CustomDropdown'
+import { submitContactQuery } from '../../lib/queryService'
 import './Contact.css'
 
 export default function Contact() {
@@ -11,6 +12,8 @@ export default function Contact() {
         subject: '',
         message: ''
     })
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
@@ -21,18 +24,41 @@ export default function Contact() {
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        alert('Thank you for contacting us! We will get back to you soon.')
-        // Reset form
-        setFormData({
-            fullName: '',
-            email: '',
-            phone: '',
-            role: '',
-            subject: '',
-            message: ''
+        setIsSubmitting(true)
+        setSubmitStatus('idle')
+
+        // Build message with role info
+        const fullMessage = formData.role
+            ? `[${formData.role}]${formData.phone ? ` | Phone: ${formData.phone}` : ''}\n\n${formData.message}`
+            : formData.message
+
+        const result = await submitContactQuery({
+            name: formData.fullName,
+            email: formData.email,
+            subject: formData.subject,
+            message: fullMessage
         })
+
+        setIsSubmitting(false)
+
+        if (result.success) {
+            setSubmitStatus('success')
+            // Reset form
+            setFormData({
+                fullName: '',
+                email: '',
+                phone: '',
+                role: '',
+                subject: '',
+                message: ''
+            })
+            // Reset status after 5 seconds
+            setTimeout(() => setSubmitStatus('idle'), 5000)
+        } else {
+            setSubmitStatus('error')
+        }
     }
 
     const contactInfo = {
@@ -152,9 +178,20 @@ export default function Contact() {
                             </div>
 
                             {/* Submit Button */}
-                            <button type="submit" className="contact-submit-btn">
-                                Send Message
+                            <button
+                                type="submit"
+                                className={`contact-submit-btn ${submitStatus}`}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? 'Sending...' :
+                                    submitStatus === 'success' ? 'Message Sent!' :
+                                        submitStatus === 'error' ? 'Failed - Try Again' :
+                                            'Send Message'}
                             </button>
+
+                            {submitStatus === 'success' && (
+                                <p className="submit-success">Thank you! We'll get back to you soon.</p>
+                            )}
                         </form>
                     </div>
 

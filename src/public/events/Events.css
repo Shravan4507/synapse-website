@@ -1,53 +1,312 @@
 .events-page {
     min-height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 2rem;
+    padding: 120px 2rem 60px;
     position: relative;
     z-index: 1;
 }
 
 .events-content {
     text-align: center;
-    max-width: 800px;
+    max-width: 1200px;
     width: 100%;
 }
 
 .events-title {
-    font-size: 5rem;
+    font-size: 4rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #ff00ff, #00d4ff);
+    background: linear-gradient(135deg, #ff00ff, #00d4ff, #00ff88);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 1rem;
-    animation: fadeInUp 0.8s ease-out;
+    margin-bottom: 0.5rem;
+    animation: fadeInUp 0.6s ease-out;
 }
 
 .events-subtitle {
-    font-size: 2rem;
+    font-size: 1.75rem;
+    font-weight: 600;
     color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 2rem;
-    animation: fadeInUp 1s ease-out;
+    margin-bottom: 0.75rem;
+    animation: fadeInUp 0.7s ease-out;
 }
 
-.events-placeholder {
-    margin-top: 3rem;
-    animation: fadeInUp 1.2s ease-out;
+.events-info {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+    animation: fadeInUp 0.8s ease-out;
 }
 
-.events-placeholder p {
-    font-size: 1.2rem;
+/* ========================================
+   DAY PASS CARDS CONTAINER
+   ======================================== */
+.day-passes-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+/* ========================================
+   DAY PASS CARD
+   ======================================== */
+.day-pass-card {
+    background: rgba(20, 20, 30, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 2rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.5s ease-out backwards;
+    position: relative;
+    overflow: hidden;
+}
+
+.day-pass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, transparent);
+    transition: all 0.3s ease;
+}
+
+.day-pass-card:hover:not(.disabled) {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.day-pass-card.selected {
+    border-color: rgba(0, 212, 255, 0.5);
+    background: rgba(0, 212, 255, 0.05);
+}
+
+.day-pass-card.selected::before {
+    background: linear-gradient(90deg, #00d4ff, #00ff88);
+}
+
+.day-pass-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.day-pass-card.disabled:hover {
+    transform: none;
+}
+
+/* Card Header */
+.day-pass-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.day-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.day-pass-card.selected .day-badge {
+    background: rgba(0, 212, 255, 0.2);
+    color: #00d4ff;
+}
+
+.locked-badge {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Price */
+.day-pass-price {
+    margin-bottom: 0.5rem;
+}
+
+.price-symbol {
+    font-size: 1.5rem;
+    font-weight: 600;
     color: rgba(255, 255, 255, 0.7);
-    line-height: 1.8;
-    margin: 0.8rem 0;
+    vertical-align: top;
 }
 
+.price-amount {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1;
+}
+
+.day-pass-card.selected .price-amount {
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Date */
+.day-pass-date {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 1.5rem;
+}
+
+/* Highlights */
+.day-pass-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    text-align: left;
+}
+
+.day-pass-highlights li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.day-pass-highlights li:last-child {
+    border-bottom: none;
+}
+
+.highlight-icon {
+    color: rgba(0, 212, 255, 0.8);
+    font-weight: 600;
+}
+
+.day-pass-card.selected .highlight-icon {
+    color: #00ff88;
+}
+
+/* Action */
+.day-pass-action {
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.action-select {
+    display: inline-block;
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.day-pass-card:hover:not(.disabled) .action-select {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.action-selected {
+    display: inline-block;
+    padding: 10px 24px;
+    background: rgba(0, 212, 255, 0.15);
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    border-radius: 25px;
+    color: #00d4ff;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.action-locked {
+    display: inline-block;
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 25px;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* ========================================
+   CHECKOUT SECTION
+   ======================================== */
+.checkout-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(20, 20, 30, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.checkout-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+.checkout-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.checkout-total {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.checkout-total strong {
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.checkout-btn {
+    padding: 14px 32px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 255, 136, 0.2));
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    border-radius: 30px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.checkout-btn:hover {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 255, 136, 0.3));
+    border-color: rgba(0, 212, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+.checkout-btn:active {
+    transform: scale(0.98);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px);
     }
 
     to {
@@ -56,27 +315,83 @@
     }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .events-title {
-        font-size: 3.5rem;
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1024px) {
+    .day-passes-container {
+        gap: 1.25rem;
     }
 
-    .events-subtitle {
-        font-size: 1.5rem;
+    .day-pass-card {
+        padding: 1.5rem 1.25rem;
     }
 
-    .events-placeholder p {
-        font-size: 1rem;
+    .price-amount {
+        font-size: 3rem;
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+    .events-page {
+        padding: 100px 1rem 40px;
+    }
+
     .events-title {
         font-size: 2.5rem;
     }
 
     .events-subtitle {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
+    }
+
+    .day-passes-container {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto 2rem;
+    }
+
+    .day-pass-card {
+        padding: 1.5rem;
+    }
+
+    .price-amount {
+        font-size: 2.5rem;
+    }
+
+    .checkout-section {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .checkout-summary {
+        text-align: center;
+    }
+
+    .checkout-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .events-title {
+        font-size: 2rem;
+    }
+
+    .events-subtitle {
+        font-size: 1rem;
+    }
+
+    .events-info {
+        font-size: 0.9rem;
+    }
+
+    .day-pass-card {
+        padding: 1.25rem;
+    }
+
+    .price-amount {
+        font-size: 2.25rem;
     }
 }

@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react'
 import { Navigate } from 'react-router-dom'
-import { isAuthenticated } from '../../utils/auth'
+import { onAuthChange } from '../../lib/auth'
+import type { User } from 'firebase/auth'
 
 interface ProtectedRouteProps {
     children: React.ReactNode
@@ -8,15 +10,32 @@ interface ProtectedRouteProps {
 /**
  * ProtectedRoute Component
  * Wraps routes that require authentication
- * Redirects to login page if user is not authenticated or session has expired
+ * Redirects to login page if user is not authenticated
  */
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-    // Check if user is authenticated with valid session
-    const authenticated = isAuthenticated()
+    const [user, setUser] = useState<User | null>(null)
+    const [loading, setLoading] = useState(true)
 
-    if (!authenticated) {
-        // Redirect to login page if not authenticated
-        // The user will be redirected back after login (future enhancement)
+    useEffect(() => {
+        const unsubscribe = onAuthChange((firebaseUser) => {
+            setUser(firebaseUser)
+            setLoading(false)
+        })
+
+        return () => unsubscribe()
+    }, [])
+
+    // Show loading state while checking auth
+    if (loading) {
+        return (
+            <div className="auth-loading">
+                <div className="loading-spinner"></div>
+            </div>
+        )
+    }
+
+    // Redirect to login if not authenticated
+    if (!user) {
         return <Navigate to="/user-login" replace />
     }
 
