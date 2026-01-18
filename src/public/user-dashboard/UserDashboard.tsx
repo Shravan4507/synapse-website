@@ -4,6 +4,12 @@ import { logout } from '../../utils/auth'
 import { getCurrentUser } from '../../lib/auth'
 import { getUserOrAdminDocument, type UserDocument, type AdminDocument } from '../../lib/userService'
 import { getAllPromotions, type Promotion } from '../../lib/sponsorService'
+import {
+    getAllUserRegistrations,
+    generateUnifiedQRData,
+    type DayPassRegistration
+} from '../../lib/dayPassRegistrationService'
+import { isVolunteer } from '../../lib/qrVerificationService'
 import ProfileOverlay from '../../components/profile-overlay/ProfileOverlay'
 import SettingsOverlay from '../../components/settings-overlay/SettingsOverlay'
 import AdminPanel from '../../components/admin-panel/AdminPanel'
@@ -24,6 +30,14 @@ export default function UserDashboard() {
     const [currentPromoIndex, setCurrentPromoIndex] = useState(0)
     const [promoImageIndex, setPromoImageIndex] = useState(0)
 
+    // Registration state for HolographicCard
+    const [hasRegistrations, setHasRegistrations] = useState(false)
+    const [unifiedQRData, setUnifiedQRData] = useState<string>('')
+    const [dayPassReg, setDayPassReg] = useState<DayPassRegistration | null>(null)
+
+    // Volunteer state
+    const [isUserVolunteer, setIsUserVolunteer] = useState(false)
+
     // Fetch user data from Firestore
     useEffect(() => {
         const fetchUserData = async () => {
@@ -38,6 +52,10 @@ export default function UserDashboard() {
             if (data) {
                 setUserData(data)
                 setIsAdmin(adminStatus)
+
+                // Check if user is a volunteer
+                const volunteerStatus = await isVolunteer(user.uid)
+                setIsUserVolunteer(volunteerStatus)
             } else {
                 // User doesn't have a profile, redirect to signup
                 navigate('/signup')
@@ -54,6 +72,51 @@ export default function UserDashboard() {
         }
         fetchPromos()
     }, [navigate])
+
+    // Fetch user registrations for QR generation
+    useEffect(() => {
+        const fetchRegistrations = async () => {
+            const user = getCurrentUser()
+            if (!user || !userData) return
+
+            const { dayPass, competitions, events } = await getAllUserRegistrations(user.uid)
+            setDayPassReg(dayPass)
+
+            // Build registration list for QR
+            const regList: { type: 'daypass' | 'competition' | 'event'; id: string; name: string }[] = []
+
+            if (dayPass) {
+                regList.push({
+                    type: 'daypass',
+                    id: dayPass.id || 'dp',
+                    name: `Day ${dayPass.selectedDays.join(', ')}`
+                })
+            }
+
+            competitions.forEach(c => {
+                regList.push({ type: 'competition', id: c.id, name: c.name })
+            })
+
+            events.forEach(e => {
+                regList.push({ type: 'event', id: e.id, name: e.name })
+            })
+
+            if (regList.length > 0) {
+                setHasRegistrations(true)
+                const qrData = generateUnifiedQRData(
+                    userData.synapseId,
+                    dayPass?.governmentIdLast4 || '',
+                    regList
+                )
+                setUnifiedQRData(qrData)
+            } else {
+                setHasRegistrations(false)
+                setUnifiedQRData('')
+            }
+        }
+
+        fetchRegistrations()
+    }, [userData])
 
     // Auto-rotate through promotions (when multiple exist)
     useEffect(() => {
@@ -163,6 +226,21 @@ export default function UserDashboard() {
                             My Events
                         </button>
 
+                        {/* Volunteer-only option */}
+                        {isUserVolunteer && (
+                            <>
+                                <div className="volunteer-section-divider">
+                                    <span>Volunteer</span>
+                                </div>
+                                <button
+                                    className="sidebar-nav-btn volunteer-btn"
+                                    onClick={() => navigate('/scan-qr')}
+                                >
+                                    📷 Scan QR
+                                </button>
+                            </>
+                        )}
+
                         {/* Admin-only options */}
                         {isAdmin && (
                             <>
@@ -239,9 +317,74 @@ export default function UserDashboard() {
 
                 {activeView === 'events' && (
                     <div className="content-container">
-                        <h2 className="content-title">Events</h2>
-                        {/* Events content will go here */}
-                        <p className="content-placeholder">Events content coming soon...</p>
+                        <h2 className="content-title">My Day Passes</h2>
+
+                        {dayPassReg ? (
+                            <div className="my-events-content">
+                                <div className="registration-status-card">
+                                    <div className="status-header">
+                                        <span className={`status-badge ${dayPassReg.status === 'approved' ? 'approved' : 'pending'}`}>
+                                            {dayPassReg.status === 'approved' ? '✓ Approved' : '⏳ Pending'}
+                                        </span>
+                                        <span className={`payment-badge ${dayPassReg.paymentStatus === 'paid' ? 'paid' : dayPassReg.paymentStatus === 'free' ? 'free' : 'pending'}`}>
+                                            {dayPassReg.paymentStatus === 'paid' ? '💳 Paid' : dayPassReg.paymentStatus === 'free' ? '🎁 Free' : '⏳ Payment Pending'}
+                                        </span>
+                                    </div>
+
+                                    <div className="registered-days">
+                                        <h3>Your Registered Days</h3>
+                                        <div className="days-grid">
+                                            {dayPassReg.selectedDays?.map(day => (
+                                                <div key={day} className="day-badge">
+                                                    <span className="day-icon">
+                                                        {day === 1 ? '🌅' : day === 2 ? '☀️' : '🌙'}
+                                                    </span>
+                                                    <span className="day-label">Day {day}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="registration-details">
+                                        <div className="detail-row">
+                                            <span className="detail-label">Total Amount</span>
+                                            <span className="detail-value">₹{dayPassReg.totalAmount || 0}</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Registration Date</span>
+                                            <span className="detail-value">
+                                                {dayPassReg.createdAt?.toDate?.().toLocaleDateString('en-IN', {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    year: 'numeric'
+                                                }) || 'N/A'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="events-action-buttons">
+                                    <button
+                                        className="add-days-btn"
+                                        onClick={() => navigate('/events')}
+                                    >
+                                        + Add More Days
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="no-events-state">
+                                <div className="no-events-icon">🎫</div>
+                                <h3>No Day Passes Yet</h3>
+                                <p>You haven't registered for any day passes. Browse our events and register to get your virtual pass!</p>
+                                <button
+                                    className="browse-events-btn"
+                                    onClick={() => navigate('/events')}
+                                >
+                                    Browse Day Passes
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -286,26 +429,8 @@ export default function UserDashboard() {
                                     gender: userData?.gender,
                                     college: userData?.college
                                 }}
-                                registrations={[
-                                    {
-                                        id: '1',
-                                        eventName: 'Hackathon 2026',
-                                        type: 'competition',
-                                        qrData: 'SYN-HACK-001'
-                                    },
-                                    {
-                                        id: '2',
-                                        eventName: 'Tech Summit',
-                                        type: 'event',
-                                        qrData: 'SYN-EVENT-002'
-                                    },
-                                    {
-                                        id: '3',
-                                        eventName: 'Gaming Cup',
-                                        type: 'competition',
-                                        qrData: 'SYN-GAME-003'
-                                    }
-                                ]}
+                                hasRegistrations={hasRegistrations}
+                                qrData={unifiedQRData}
                             />
                         </div>
                     </div>

@@ -1,14 +1,7 @@
-import React, { useState, useRef, useCallback } from 'react'
+import { useState } from 'react'
 import QRCode from 'react-qr-code'
 import FloatingLines from '../background/FloatingLines'
 import './HolographicCard.css'
-
-interface Registration {
-    id: string
-    eventName: string
-    type: 'event' | 'competition'
-    qrData: string
-}
 
 interface HolographicCardProps {
     user: {
@@ -19,65 +12,22 @@ interface HolographicCardProps {
         gender?: string
         college?: string
     }
-    registrations?: Registration[]
+    qrData?: string  // Single unified QR data
+    hasRegistrations: boolean  // Whether user has any registrations
 }
 
-export default function HolographicCard({ user, registrations = [] }: HolographicCardProps) {
-    const [activeQRIndex, setActiveQRIndex] = useState(0)
+export default function HolographicCard({ user, qrData, hasRegistrations }: HolographicCardProps) {
     const [isExpanded, setIsExpanded] = useState(false)
-    const [qrNameOpacity, setQrNameOpacity] = useState(1)
     const [isCardVisible, setIsCardVisible] = useState(false)
-
-    // Swipe handling state
-    const touchStartX = useRef<number | null>(null)
-    const touchEndX = useRef<number | null>(null)
-
-    const hasRegistrations = registrations.length > 0
-    const activeRegistration = hasRegistrations ? registrations[activeQRIndex] : null
-
-    // Navigation Handlers with fade transition
-    const handlePrev = useCallback((e?: React.MouseEvent) => {
-        e?.stopPropagation()
-        setQrNameOpacity(0)
-        setTimeout(() => {
-            setActiveQRIndex(prev => (prev - 1 + registrations.length) % registrations.length)
-            setQrNameOpacity(1)
-        }, 150)
-    }, [registrations.length])
-
-    const handleNext = useCallback((e?: React.MouseEvent) => {
-        e?.stopPropagation()
-        setQrNameOpacity(0)
-        setTimeout(() => {
-            setActiveQRIndex(prev => (prev + 1) % registrations.length)
-            setQrNameOpacity(1)
-        }, 150)
-    }, [registrations.length])
-
-    // Swipe Handlers
-    const onTouchStart = useCallback((e: React.TouchEvent) => {
-        touchEndX.current = null
-        touchStartX.current = e.targetTouches[0].clientX
-    }, [])
-
-    const onTouchMove = useCallback((e: React.TouchEvent) => {
-        touchEndX.current = e.targetTouches[0].clientX
-    }, [])
-
-    const onTouchEnd = useCallback(() => {
-        if (!touchStartX.current || !touchEndX.current) return
-
-        const distance = touchStartX.current - touchEndX.current
-        const isLeftSwipe = distance > 30
-        const isRightSwipe = distance < -30
-
-        if (isLeftSwipe) handleNext()
-        if (isRightSwipe) handlePrev()
-    }, [handleNext, handlePrev])
 
     // Get user initials for avatar
     const getInitials = (name: string) => {
         return name.charAt(0).toUpperCase()
+    }
+
+    // Don't show anything if user has no registrations
+    if (!hasRegistrations) {
+        return null
     }
 
     return (
@@ -155,63 +105,25 @@ export default function HolographicCard({ user, registrations = [] }: Holographi
                                         )}
                                     </div>
 
-                                    {/* QR Section (Right) */}
-                                    {hasRegistrations && activeRegistration && (
+                                    {/* QR Section (Right) - Single QR */}
+                                    {qrData && (
                                         <div className="holo-qr-section">
-                                            <div className="holo-qr-wrapper">
-                                                {/* Left Arrow */}
-                                                {registrations.length > 1 && (
-                                                    <button
-                                                        className="holo-qr-nav holo-qr-nav-left"
-                                                        onClick={handlePrev}
-                                                        aria-label="Previous QR"
-                                                    >
-                                                        ‹
-                                                    </button>
-                                                )}
-
-                                                {/* QR Stack */}
-                                                <div
-                                                    className="holo-qr-stack"
-                                                    onClick={() => setIsExpanded(true)}
-                                                    onTouchStart={onTouchStart}
-                                                    onTouchMove={onTouchMove}
-                                                    onTouchEnd={onTouchEnd}
-                                                >
-                                                    {registrations.map((reg, idx) => (
-                                                        <div
-                                                            key={reg.id}
-                                                            className={`holo-qr-slide ${idx === activeQRIndex ? 'active' : ''}`}
-                                                        >
-                                                            <QRCode
-                                                                value={reg.qrData}
-                                                                size={80}
-                                                                level="M"
-                                                                fgColor="#FFFFFF"
-                                                                bgColor="transparent"
-                                                            />
-                                                        </div>
-                                                    ))}
-                                                </div>
-
-                                                {/* Right Arrow */}
-                                                {registrations.length > 1 && (
-                                                    <button
-                                                        className="holo-qr-nav holo-qr-nav-right"
-                                                        onClick={handleNext}
-                                                        aria-label="Next QR"
-                                                    >
-                                                        ›
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            {/* QR Name Label */}
                                             <div
-                                                className="holo-qr-name"
-                                                style={{ opacity: qrNameOpacity }}
+                                                className="holo-qr-wrapper"
+                                                onClick={() => setIsExpanded(true)}
                                             >
-                                                {activeRegistration.eventName}
+                                                <div className="holo-qr-code">
+                                                    <QRCode
+                                                        value={qrData}
+                                                        size={80}
+                                                        level="M"
+                                                        fgColor="#FFFFFF"
+                                                        bgColor="transparent"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="holo-qr-name">
+                                                Synapse Pass
                                             </div>
                                         </div>
                                     )}
@@ -231,16 +143,17 @@ export default function HolographicCard({ user, registrations = [] }: Holographi
             </div>
 
             {/* Expanded QR Modal */}
-            {isExpanded && activeRegistration && (
+            {isExpanded && qrData && (
                 <div className="holo-qr-modal-overlay" onClick={() => setIsExpanded(false)}>
                     <div className="holo-qr-modal-content" onClick={e => e.stopPropagation()}>
-                        <div className="holo-qr-modal-label">{activeRegistration.eventName}</div>
+                        <div className="holo-qr-modal-label">Synapse Pass</div>
                         <QRCode
-                            value={activeRegistration.qrData}
+                            value={qrData}
                             size={300}
                             level="H"
                         />
                         <div className="holo-qr-modal-hint">Show this code at the entrance</div>
+                        <div className="holo-qr-modal-id">{user.synapseId}</div>
                     </div>
                 </div>
             )}

@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.4.0",
+    "@react-three/fiber": "^9.5.0",
     "firebase": "^12.7.0",
     "gsap": "^3.13.0",
     "maath": "^0.10.8",

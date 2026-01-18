@@ -327,81 +327,177 @@
     color: rgba(255, 255, 255, 0.5);
 }
 
-/* Registrations Table */
+/* ========================================
+   EXCEL-LIKE DATA TABLE
+   ======================================== */
 .registrations-table {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     overflow: hidden;
 }
 
-.table-header {
-    display: grid;
-    grid-template-columns: 1.5fr 1.2fr 1.2fr 0.7fr 0.8fr 0.5fr;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    font-size: 0.75rem;
+.table-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Scrollbar styling */
+.table-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.registrations-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+/* Header - Fixed style */
+.registrations-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.registrations-table th {
+    background: rgba(30, 30, 40, 0.98);
+    color: rgba(255, 255, 255, 0.6);
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
 }
 
-.table-row {
-    display: grid;
-    grid-template-columns: 1.5fr 1.2fr 1.2fr 0.7fr 0.8fr 0.5fr;
-    padding: 12px 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
+.registrations-table th:first-child {
+    padding-left: 16px;
+}
+
+/* Body Rows */
+.registrations-table tbody tr {
     cursor: pointer;
-    align-items: center;
+    transition: background 0.15s ease;
 }
 
-.table-row:hover {
-    background: rgba(255, 255, 255, 0.03);
+.registrations-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
 }
 
-.reg-name {
+.registrations-table tbody tr:hover {
+    background: rgba(0, 212, 255, 0.08);
+}
+
+.registrations-table td {
+    padding: 10px 12px;
+    color: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: middle;
+}
+
+.registrations-table td:first-child {
+    padding-left: 16px;
+}
+
+/* Cell Types */
+.registrations-table .cell-id {
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 0.8rem;
+    color: #00d4ff;
+}
+
+.registrations-table .cell-name {
     font-weight: 600;
     color: white;
 }
 
-.college {
-    color: rgba(255, 255, 255, 0.6);
+.registrations-table .cell-muted {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
 }
 
-.status {
-    font-size: 0.75rem;
+.registrations-table .cell-days {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.registrations-table .day-chip {
+    background: rgba(0, 255, 136, 0.15);
+    color: #00ff88;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.registrations-table .cell-amount {
+    font-weight: 600;
+    color: white;
+}
+
+/* Status Badges */
+.status-pill {
+    display: inline-block;
+    font-size: 0.68rem;
     font-weight: 600;
     text-transform: uppercase;
-    padding: 4px 8px;
-    border-radius: 12px;
-    width: fit-content;
+    letter-spacing: 0.3px;
+    padding: 3px 8px;
+    border-radius: 10px;
 }
 
-.status.pending {
-    background: rgba(255, 200, 50, 0.2);
+.status-pill.pending {
+    background: rgba(255, 200, 50, 0.15);
     color: #ffc832;
 }
 
-.status.approved {
-    background: rgba(0, 255, 136, 0.2);
+.status-pill.approved {
+    background: rgba(0, 255, 136, 0.15);
     color: #00ff88;
 }
 
-.status.rejected {
-    background: rgba(255, 100, 100, 0.2);
+.status-pill.rejected {
+    background: rgba(255, 100, 100, 0.15);
     color: #ff6b6b;
 }
 
-.delete-reg-btn {
-    width: 28px;
-    height: 28px;
+.status-pill.paid {
+    background: rgba(0, 200, 150, 0.15);
+    color: #00c896;
+}
+
+.status-pill.free {
+    background: rgba(150, 150, 150, 0.15);
+    color: #999;
+}
+
+/* Delete Button */
+.delete-btn {
+    width: 26px;
+    height: 26px;
     border: none;
-    background: rgba(255, 100, 100, 0.15);
-    border-radius: 24px;
+    background: transparent;
+    color: rgba(255, 100, 100, 0.7);
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    transition: all 0.15s ease;
+}
+
+.delete-btn:hover {
+    background: rgba(255, 100, 100, 0.15);
+    color: #ff6b6b;
 }
 
 /* ========================================
@@ -772,4 +868,480 @@
         flex-direction: column;
         align-items: stretch;
     }
+}
+
+/* ========================================
+   DAY CARDS OVERLAY
+   ======================================== */
+.day-cards-overlay {
+    width: 100%;
+    max-width: 900px;
+}
+
+.form-subtitle {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    margin: -1rem 0 1.5rem 0;
+}
+
+.day-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.day-card-form {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.25rem;
+}
+
+.day-card-form h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 1rem 0;
+    text-align: center;
+}
+
+.day-pass-image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.day-pass-image-preview {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.day-pass-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.day-pass-image-preview .remove-image-btn {
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+}
+
+@media (max-width: 900px) {
+    .day-cards-grid {
+        grid-template-columns: 1fr;
+        max-width: 350px;
+        margin: 0 auto 1.5rem;
+    }
+
+    .day-cards-overlay {
+        max-width: 400px;
+    }
+}
+
+/* ========================================
+   REGISTRATIONS SECTIONS
+   ======================================== */
+.registrations-section {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.section-header h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.toolbar-actions .filter-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toolbar-actions .filter-section label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.toolbar-actions .filter-section select {
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: white;
+    font-size: 0.85rem;
+}
+
+/* Table Column for Days */
+.table-row .days,
+.table-header span:nth-child(3) {
+    min-width: 80px;
+}
+
+.table-row .synapse-id {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #00d4ff;
+}
+
+/* Synapse ID Badge in Details */
+.synapse-id-badge {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+/* Days Badge in Details */
+.days-badge {
+    background: rgba(0, 255, 136, 0.15);
+    color: #00ff88;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+}
+
+/* ========================================
+   ADMIN CONTROLS
+   ======================================== */
+.admin-controls {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-group {
+    margin-bottom: 1.25rem;
+}
+
+.control-group>label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.status-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.status-btn {
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.status-btn.pending.active {
+    background: rgba(255, 200, 50, 0.2);
+    border-color: rgba(255, 200, 50, 0.4);
+    color: #ffc832;
+}
+
+.status-btn.approved.active {
+    background: rgba(0, 255, 136, 0.2);
+    border-color: rgba(0, 255, 136, 0.4);
+    color: #00ff88;
+}
+
+.status-btn.rejected.active {
+    background: rgba(255, 100, 100, 0.2);
+    border-color: rgba(255, 100, 100, 0.4);
+    color: #ff6b6b;
+}
+
+.status-btn.free.active {
+    background: rgba(150, 150, 150, 0.2);
+    border-color: rgba(150, 150, 150, 0.4);
+    color: #aaa;
+}
+
+/* Danger Zone */
+.danger-zone {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 80, 80, 0.2);
+}
+
+.delete-registration-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: rgba(255, 80, 80, 0.1);
+    border: 1px solid rgba(255, 80, 80, 0.3);
+    border-radius: 8px;
+    color: #ff6b6b;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-registration-btn:hover {
+    background: rgba(255, 80, 80, 0.2);
+    border-color: rgba(255, 80, 80, 0.5);
+}
+
+/* ========================================
+   EXISTING DAYS GRID
+   ======================================== */
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.event-list-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.25rem;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.event-list-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--accent-color, rgba(255, 255, 255, 0.2));
+    transform: translateY(-2px);
+}
+
+.event-list-card.inactive {
+    opacity: 0.6;
+}
+
+.event-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.event-list-icon {
+    font-size: 1.5rem;
+}
+
+.event-list-price {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.event-list-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.5rem 0;
+}
+
+.event-list-desc {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.day-pass-thumbnail {
+    width: 100%;
+    height: 120px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.day-pass-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-registrations-count {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.inactive-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(255, 100, 100, 0.2);
+    color: #ff6b6b;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .events-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Capacity Hint */
+.capacity-hint {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: rgba(0, 212, 255, 0.8);
+    font-weight: 500;
+}
+
+/* Image Drop Zone */
+.image-drop-zone {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.02);
+    min-height: 100px;
+}
+
+.image-drop-zone:hover {
+    border-color: rgba(0, 212, 255, 0.4);
+    background: rgba(0, 212, 255, 0.05);
+}
+
+.image-drop-zone.drag-active {
+    border-color: rgba(0, 212, 255, 0.7);
+    background: rgba(0, 212, 255, 0.1);
+    transform: scale(1.02);
+}
+
+.drop-icon {
+    font-size: 1.5rem;
+}
+
+.drop-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.drop-hint {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.uploading-text {
+    font-size: 0.9rem;
+    color: rgba(0, 212, 255, 0.9);
+    animation: pulse 1.5s infinite;
+}
+
+/* Image Gallery */
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.gallery-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-item .remove-image-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255, 70, 70, 0.9);
+    border: none;
+    color: white;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.gallery-item:hover .remove-image-btn {
+    opacity: 1;
+}
+
+.primary-badge {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    background: rgba(0, 212, 255, 0.9);
+    color: #000;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
 }

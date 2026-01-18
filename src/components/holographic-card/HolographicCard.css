@@ -364,6 +364,14 @@
     font-weight: 500;
 }
 
+.holo-qr-modal-id {
+    color: #888;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+}
+
 /* ========================================
    ANIMATIONS
    ======================================== */

@@ -254,6 +254,44 @@
 }
 
 /* ========================================
+   VOLUNTEER STYLES
+   ======================================== */
+
+.volunteer-section-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+    padding: 0 0.5rem;
+}
+
+.volunteer-section-divider::before,
+.volunteer-section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.4), transparent);
+}
+
+.volunteer-section-divider span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(0, 255, 136, 0.8);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.sidebar-nav-btn.volunteer-btn {
+    border-color: rgba(0, 255, 136, 0.3);
+    background: rgba(0, 255, 136, 0.05);
+}
+
+.sidebar-nav-btn.volunteer-btn:active {
+    background: rgba(0, 255, 136, 0.15);
+    border-color: rgba(0, 255, 136, 0.5);
+}
+
+/* ========================================
    SYNAPSE ID DISPLAY
    ======================================== */
 
@@ -692,4 +730,189 @@
         min-height: 35vh;
         gap: 1.5rem;
     }
+}
+
+/* ========================================
+   MY EVENTS SECTION
+   ======================================== */
+
+.my-events-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.registration-status-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.status-header {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.status-badge,
+.payment-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.approved {
+    background: rgba(0, 255, 136, 0.15);
+    color: #00ff88;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.status-badge.pending {
+    background: rgba(255, 180, 50, 0.15);
+    color: #ffb432;
+    border: 1px solid rgba(255, 180, 50, 0.3);
+}
+
+.payment-badge.paid {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.payment-badge.free {
+    background: rgba(0, 255, 136, 0.15);
+    color: #00ff88;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.payment-badge.pending {
+    background: rgba(255, 180, 50, 0.15);
+    color: #ffb432;
+    border: 1px solid rgba(255, 180, 50, 0.3);
+}
+
+.registered-days {
+    margin-bottom: 1.5rem;
+}
+
+.registered-days h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.days-grid {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.day-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 12px;
+}
+
+.day-icon {
+    font-size: 1.25rem;
+}
+
+.day-label {
+    font-weight: 600;
+    color: white;
+}
+
+.registration-details {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+}
+
+.detail-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    color: white;
+    font-weight: 600;
+}
+
+.events-action-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.add-days-btn {
+    padding: 0.75rem 1.5rem;
+    background: rgba(0, 212, 255, 0.15);
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    border-radius: 8px;
+    color: #00d4ff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-days-btn:hover {
+    background: rgba(0, 212, 255, 0.25);
+    border-color: rgba(0, 212, 255, 0.6);
+}
+
+/* No Events State */
+.no-events-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+}
+
+.no-events-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.no-events-state h3 {
+    color: white;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.no-events-state p {
+    color: rgba(255, 255, 255, 0.5);
+    max-width: 400px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.5;
+}
+
+.browse-events-btn {
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.browse-events-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
 }

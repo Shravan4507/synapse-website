@@ -3,26 +3,24 @@ import { useNavigate } from 'react-router-dom'
 import { onAuthChange } from '../../lib/auth'
 import { getAdminDocument } from '../../lib/userService'
 import {
-    type Event,
-    getEvents,
-    createEvent,
-    updateEvent,
-    deleteEvent,
-    EVENT_ICONS,
-    EVENT_COLORS
-} from '../../lib/eventService'
+    type DayPass,
+    getDayPasses,
+    saveDayPass
+} from '../../lib/dayPassService'
 import {
-    type EventRegistration,
-    getAllEventRegistrations,
-    deleteEventRegistration,
-    exportEventRegistrationsToCSV,
-    downloadEventCSV,
-    getEventRegistrationStats
-} from '../../lib/eventRegistrationService'
+    type DayPassRegistration,
+    getAllDayPassRegistrations,
+    deleteDayPassRegistration,
+    updateDayPassStatus,
+    updateDayPassPaymentStatus,
+    exportDayPassRegistrationsToCSV,
+    downloadDayPassCSV,
+    getDayPassRegistrationStats
+} from '../../lib/dayPassRegistrationService'
 import { uploadImages } from '../../lib/imageStorage'
 import './ManageEvents.css'
 
-type OverlayType = 'none' | 'event' | 'registration'
+type OverlayType = 'none' | 'dayCards'
 type TabType = 'events' | 'registrations'
 
 export default function ManageEvents() {
@@ -35,48 +33,59 @@ export default function ManageEvents() {
     const [activeTab, setActiveTab] = useState<TabType>('events')
 
     // Data state
-    const [events, setEvents] = useState<Event[]>([])
-    const [registrations, setRegistrations] = useState<EventRegistration[]>([])
+    const [dayPasses, setDayPasses] = useState<DayPass[]>([])
+    const [dayPassRegistrations, setDayPassRegistrations] = useState<DayPassRegistration[]>([])
 
     // UI state
     const [activeOverlay, setActiveOverlay] = useState<OverlayType>('none')
-    const [selectedEventFilter, setSelectedEventFilter] = useState<string>('all')
-    const [viewingRegistration, setViewingRegistration] = useState<EventRegistration | null>(null)
+    const [viewingDayPassReg, setViewingDayPassReg] = useState<DayPassRegistration | null>(null)
 
-    // Event form state
-    const [editingEventId, setEditingEventId] = useState<string | null>(null)
-    const [eventForm, setEventForm] = useState({
-        name: '',
-        description: '',
-        date: '',
-        time: '',
-        venue: '',
-        price: 0,
-        capacity: 0,
-        icon: '🎉',
-        color: '#00d4ff',
-        images: [] as string[],
-        imageDisplayMode: 'fill' as 'fill' | 'fit' | 'stretch' | 'tile' | 'centre',
-        highlights: '',
-        rules: '',
-        isActive: true
+    // Day Pass form state
+    const [dayPassForms, setDayPassForms] = useState<{
+        [key: number]: { images: string[]; price: number; events: string; capacity: number; isActive: boolean }
+    }>({
+        1: { images: [], price: 150, events: '', capacity: 0, isActive: true },
+        2: { images: [], price: 100, events: '', capacity: 0, isActive: true },
+        3: { images: [], price: 50, events: '', capacity: 0, isActive: true }
     })
-    const [eventFormError, setEventFormError] = useState('')
-    const [eventSubmitting, setEventSubmitting] = useState(false)
-    const [imageUploading, setImageUploading] = useState(false)
-    const imageInputRef = useRef<HTMLInputElement>(null)
+    const [dayPassSaving, setDayPassSaving] = useState(false)
+    const dayPassImageRefs = useRef<{ [key: number]: HTMLInputElement | null }>({})
+    const [dayPassImageUploading, setDayPassImageUploading] = useState<number | null>(null)
+    const [dragActive, setDragActive] = useState<number | null>(null)
 
     // ========================================
     // DATA FETCHING
     // ========================================
 
     const fetchData = async () => {
-        const [eventsData, registrationsData] = await Promise.all([
-            getEvents(),
-            getAllEventRegistrations()
+        const [dayPassesData, dayPassRegsData] = await Promise.all([
+            getDayPasses(),
+            getAllDayPassRegistrations()
         ])
-        setEvents(eventsData)
-        setRegistrations(registrationsData)
+        setDayPasses(dayPassesData)
+        setDayPassRegistrations(dayPassRegsData)
+
+        // Populate day pass forms with existing data
+        const formData: { [key: number]: { images: string[]; price: number; events: string; capacity: number; isActive: boolean } } = {
+            1: { images: [], price: 150, events: '', capacity: 0, isActive: true },
+            2: { images: [], price: 100, events: '', capacity: 0, isActive: true },
+            3: { images: [], price: 50, events: '', capacity: 0, isActive: true }
+        }
+        dayPassesData.forEach(pass => {
+            // Handle both legacy single image and new images array
+            const images = pass.images?.length > 0
+                ? pass.images
+                : (pass.image ? [pass.image] : [])
+
+            formData[pass.day] = {
+                images,
+                price: pass.price,
+                events: pass.events.join('\n'),
+                capacity: pass.capacity || 0,
+                isActive: pass.isActive
+            }
+        })
+        setDayPassForms(formData)
     }
 
     // Check authorization
@@ -102,177 +111,87 @@ export default function ManageEvents() {
     }, [navigate])
 
     // ========================================
-    // EVENT HANDLERS
+    // DAY PASS HANDLERS
     // ========================================
 
-    const handleEventSubmit = async () => {
-        setEventFormError('')
-
-        if (!eventForm.name.trim()) {
-            setEventFormError('Name is required')
-            return
-        }
-        if (!eventForm.description.trim()) {
-            setEventFormError('Description is required')
-            return
-        }
-
-        setEventSubmitting(true)
-
-        // Parse highlights from newline-separated string
-        const highlightsArray = eventForm.highlights
-            .split('\n')
-            .map(h => h.trim())
-            .filter(h => h.length > 0)
-
-        let result
-        if (editingEventId) {
-            result = await updateEvent(editingEventId, {
-                name: eventForm.name.trim(),
-                description: eventForm.description.trim(),
-                date: eventForm.date.trim(),
-                time: eventForm.time.trim(),
-                venue: eventForm.venue.trim(),
-                price: eventForm.price,
-                capacity: eventForm.capacity || undefined,
-                icon: eventForm.icon,
-                color: eventForm.color,
-                images: eventForm.images,
-                imageDisplayMode: eventForm.imageDisplayMode,
-                highlights: highlightsArray,
-                rules: eventForm.rules?.trim() || '',
-                isActive: eventForm.isActive
-            })
-        } else {
-            result = await createEvent({
-                name: eventForm.name.trim(),
-                description: eventForm.description.trim(),
-                date: eventForm.date.trim(),
-                time: eventForm.time.trim(),
-                venue: eventForm.venue.trim(),
-                price: eventForm.price,
-                capacity: eventForm.capacity || undefined,
-                icon: eventForm.icon,
-                color: eventForm.color,
-                images: eventForm.images,
-                imageDisplayMode: eventForm.imageDisplayMode,
-                highlights: highlightsArray,
-                rules: eventForm.rules?.trim() || '',
-                isActive: eventForm.isActive
-            })
-        }
-
-        setEventSubmitting(false)
-
-        if (result.success) {
-            resetEventForm()
-            setActiveOverlay('none')
-            await fetchData()
-        } else {
-            setEventFormError(result.error || 'Failed to save event')
-        }
-    }
-
-    const resetEventForm = () => {
-        setEditingEventId(null)
-        setEventForm({
-            name: '',
-            description: '',
-            date: '',
-            time: '',
-            venue: '',
-            price: 0,
-            capacity: 0,
-            icon: '🎉',
-            color: '#00d4ff',
-            images: [],
-            imageDisplayMode: 'fill',
-            highlights: '',
-            rules: '',
-            isActive: true
-        })
-        setEventFormError('')
-    }
-
-    const handleEditEvent = (event: Event) => {
-        setEditingEventId(event.id || null)
-        setEventForm({
-            name: event.name,
-            description: event.description,
-            date: event.date || '',
-            time: event.time || '',
-            venue: event.venue || '',
-            price: event.price,
-            capacity: event.capacity || 0,
-            icon: event.icon,
-            color: event.color,
-            images: event.images || [],
-            imageDisplayMode: event.imageDisplayMode || 'fill',
-            highlights: event.highlights?.join('\n') || '',
-            rules: event.rules || '',
-            isActive: event.isActive
-        })
-        setActiveOverlay('event')
-    }
-
-    const handleDeleteEvent = async (id: string) => {
-        if (!confirm('Delete this event?')) return
-        await deleteEvent(id)
-        await fetchData()
-    }
-
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDayPassImageUpload = async (day: number, e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
         if (!files || files.length === 0) return
 
-        setImageUploading(true)
-        const result = await uploadImages(Array.from(files), 'events')
-        setImageUploading(false)
+        setDayPassImageUploading(day)
+        const result = await uploadImages(Array.from(files), 'day-passes')
+        setDayPassImageUploading(null)
 
         if (result.urls.length > 0) {
-            setEventForm(prev => ({
+            setDayPassForms(prev => ({
                 ...prev,
-                images: [...prev.images, ...result.urls]
+                [day]: { ...prev[day], images: [...prev[day].images, ...result.urls] }
             }))
         }
 
-        if (imageInputRef.current) {
-            imageInputRef.current.value = ''
+        // Reset input
+        if (dayPassImageRefs.current[day]) {
+            dayPassImageRefs.current[day]!.value = ''
         }
     }
 
-    const handleRemoveImage = (index: number) => {
-        setEventForm(prev => ({
+    const handleDayPassImageDrop = async (day: number, e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        setDragActive(null)
+
+        const files = e.dataTransfer.files
+        if (!files || files.length === 0) return
+
+        setDayPassImageUploading(day)
+        const result = await uploadImages(Array.from(files), 'day-passes')
+        setDayPassImageUploading(null)
+
+        if (result.urls.length > 0) {
+            setDayPassForms(prev => ({
+                ...prev,
+                [day]: { ...prev[day], images: [...prev[day].images, ...result.urls] }
+            }))
+        }
+    }
+
+    const handleRemoveDayPassImage = (day: number, index: number) => {
+        setDayPassForms(prev => ({
             ...prev,
-            images: prev.images.filter((_, i) => i !== index)
+            [day]: { ...prev[day], images: prev[day].images.filter((_, i) => i !== index) }
         }))
     }
 
-    // ========================================
-    // REGISTRATION HANDLERS
-    // ========================================
-
-    const filteredRegistrations = selectedEventFilter === 'all'
-        ? registrations
-        : registrations.filter(r => r.eventId === selectedEventFilter)
-
-    const handleExportCSV = () => {
-        const csv = exportEventRegistrationsToCSV(filteredRegistrations)
-        if (csv) {
-            const eventName = selectedEventFilter === 'all'
-                ? 'all_events'
-                : events.find(e => e.id === selectedEventFilter)?.name || 'registrations'
-            downloadEventCSV(csv, `${eventName.replace(/\s+/g, '_')}_registrations.csv`)
-        }
+    const handleDayPassFormChange = (day: number, field: string, value: string | number | boolean | string[]) => {
+        setDayPassForms(prev => ({
+            ...prev,
+            [day]: { ...prev[day], [field]: value }
+        }))
     }
 
-    const handleDeleteRegistration = async (id: string) => {
-        if (!confirm('Delete this registration?')) return
-        await deleteEventRegistration(id)
+    const handleSaveDayPasses = async () => {
+        setDayPassSaving(true)
+
+        for (const day of [1, 2, 3]) {
+            const form = dayPassForms[day]
+            const eventsArray = form.events
+                .split('\n')
+                .map(e => e.trim())
+                .filter(e => e.length > 0)
+
+            await saveDayPass({
+                day,
+                images: form.images,
+                price: form.price,
+                events: eventsArray,
+                capacity: form.capacity,
+                isActive: form.isActive
+            })
+        }
+
+        setDayPassSaving(false)
+        setActiveOverlay('none')
         await fetchData()
     }
-
-    const stats = getEventRegistrationStats(filteredRegistrations)
 
     // ========================================
     // RENDER
@@ -294,9 +213,9 @@ export default function ManageEvents() {
                     <button className="back-btn" onClick={() => navigate('/user-dashboard')}>
                         ← Back
                     </button>
-                    <h1 className="manage-title">Manage Events</h1>
+                    <h1 className="manage-title">Manage Day Passes</h1>
                     <p className="manage-subtitle">
-                        {events.length} event{events.length !== 1 ? 's' : ''} • {registrations.length} registration{registrations.length !== 1 ? 's' : ''}
+                        3 day passes • {dayPassRegistrations.length} registration{dayPassRegistrations.length !== 1 ? 's' : ''}
                     </p>
                 </div>
 
@@ -306,13 +225,13 @@ export default function ManageEvents() {
                         className={`tab-btn ${activeTab === 'events' ? 'active' : ''}`}
                         onClick={() => setActiveTab('events')}
                     >
-                        Events
+                        Days
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'registrations' ? 'active' : ''}`}
                         onClick={() => setActiveTab('registrations')}
                     >
-                        Registrations ({registrations.length})
+                        Registrations ({dayPassRegistrations.length})
                     </button>
                 </div>
 
@@ -323,63 +242,63 @@ export default function ManageEvents() {
                         <div className="action-buttons">
                             <button
                                 className="action-btn primary"
-                                onClick={() => {
-                                    resetEventForm()
-                                    setActiveOverlay('event')
-                                }}
+                                onClick={() => setActiveOverlay('dayCards')}
                             >
-                                Add Event
+                                🎫 Manage Day Cards
                             </button>
                         </div>
 
-                        {/* Existing Events List */}
+                        {/* Existing Days List */}
                         <div className="events-list">
-                            <h2>Existing Events</h2>
-                            {events.length === 0 ? (
-                                <p className="empty-state">No events yet. Click "Add Event" to create one.</p>
-                            ) : (
-                                <div className="events-grid">
-                                    {events.map(event => (
+                            <h2>Existing Days</h2>
+                            <div className="events-grid">
+                                {[1, 2, 3].map(dayNum => {
+                                    const dayPass = dayPasses.find(dp => dp.day === dayNum)
+                                    const form = dayPassForms[dayNum]
+                                    const regCount = dayPassRegistrations.filter(r =>
+                                        r.selectedDays?.includes(dayNum)
+                                    ).length
+
+                                    return (
                                         <div
-                                            key={event.id}
-                                            className={`event-list-card clickable-card ${!event.isActive ? 'inactive' : ''}`}
-                                            onClick={() => handleEditEvent(event)}
-                                            style={{ '--accent-color': event.color } as React.CSSProperties}
+                                            key={dayNum}
+                                            className={`event-list-card clickable-card ${!form?.isActive ? 'inactive' : ''}`}
+                                            onClick={() => setActiveOverlay('dayCards')}
+                                            style={{ '--accent-color': dayNum === 1 ? '#FF6B35' : dayNum === 2 ? '#00D4FF' : '#7AFF32' } as React.CSSProperties}
                                         >
                                             <div className="event-list-header">
-                                                <span className="event-list-icon">{event.icon}</span>
+                                                <span className="event-list-icon">
+                                                    {dayNum === 1 ? '🌅' : dayNum === 2 ? '☀️' : '🌙'}
+                                                </span>
                                                 <span
                                                     className="event-list-price"
-                                                    style={{ background: `${event.color}20`, color: event.color }}
+                                                    style={{
+                                                        background: dayNum === 1 ? '#FF6B3520' : dayNum === 2 ? '#00D4FF20' : '#7AFF3220',
+                                                        color: dayNum === 1 ? '#FF6B35' : dayNum === 2 ? '#00D4FF' : '#7AFF32'
+                                                    }}
                                                 >
-                                                    ₹{event.price}
+                                                    ₹{form?.price || (dayNum === 1 ? 150 : dayNum === 2 ? 100 : 50)}
                                                 </span>
                                             </div>
-                                            <h3 className="event-list-name">{event.name}</h3>
-                                            <p className="event-list-desc">{event.description}</p>
-                                            <div className="event-list-details">
-                                                <span>📅 {event.date || 'TBA'}</span>
-                                                <span>📍 {event.venue || 'TBA'}</span>
-                                            </div>
+                                            <h3 className="event-list-name">Day {dayNum}</h3>
+                                            <p className="event-list-desc">
+                                                {form?.events || dayPass?.events?.join(', ') || 'Events not specified yet'}
+                                            </p>
+                                            {form?.images && form.images.length > 0 && (
+                                                <div className="day-pass-thumbnail">
+                                                    <img src={form.images[0]} alt={`Day ${dayNum}`} />
+                                                </div>
+                                            )}
                                             <div className="event-registrations-count">
-                                                {registrations.filter(r => r.eventId === event.id).length} registrations
+                                                {regCount} registration{regCount !== 1 ? 's' : ''}
                                             </div>
-                                            {!event.isActive && (
+                                            {!form?.isActive && (
                                                 <span className="inactive-badge">Inactive</span>
                                             )}
-                                            <button
-                                                className="delete-btn"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleDeleteEvent(event.id!)
-                                                }}
-                                            >
-                                                ×
-                                            </button>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
+                                    )
+                                })}
+                            </div>
                         </div>
                     </>
                 )}
@@ -387,359 +306,388 @@ export default function ManageEvents() {
                 {/* REGISTRATIONS TAB */}
                 {activeTab === 'registrations' && (
                     <div className="registrations-dashboard">
-                        {/* Filter & Export */}
-                        <div className="registrations-toolbar">
-                            <div className="filter-section">
-                                <label>Filter by Event:</label>
-                                <select
-                                    value={selectedEventFilter}
-                                    onChange={e => setSelectedEventFilter(e.target.value)}
+                        {/* ================================
+                            DAY PASS REGISTRATIONS SECTION
+                           ================================ */}
+                        <div className="registrations-section">
+                            <div className="section-header">
+                                <h3>🎫 Day Pass Registrations</h3>
+                                <button
+                                    className="export-btn"
+                                    onClick={() => {
+                                        const csv = exportDayPassRegistrationsToCSV(dayPassRegistrations)
+                                        downloadDayPassCSV(csv, 'day-pass-registrations.csv')
+                                    }}
+                                    disabled={dayPassRegistrations.length === 0}
                                 >
-                                    <option value="all">All Events</option>
-                                    {events.map(event => (
-                                        <option key={event.id} value={event.id}>
-                                            {event.icon} {event.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    📥 Export CSV
+                                </button>
                             </div>
-                            <button
-                                className="export-btn"
-                                onClick={handleExportCSV}
-                                disabled={filteredRegistrations.length === 0}
-                            >
-                                📥 Export CSV
-                            </button>
-                        </div>
 
-                        {/* Stats */}
-                        <div className="stats-grid">
-                            <div className="stat-card">
-                                <span className="stat-value">{stats.total}</span>
-                                <span className="stat-label">Total</span>
-                            </div>
-                            <div className="stat-card pending">
-                                <span className="stat-value">{stats.pending}</span>
-                                <span className="stat-label">Pending</span>
-                            </div>
-                            <div className="stat-card approved">
-                                <span className="stat-value">{stats.approved}</span>
-                                <span className="stat-label">Approved</span>
-                            </div>
-                            <div className="stat-card revenue">
-                                <span className="stat-value">₹{stats.totalRevenue}</span>
-                                <span className="stat-label">Revenue</span>
-                            </div>
-                        </div>
-
-                        {/* Registrations List */}
-                        <div className="registrations-list">
-                            {filteredRegistrations.length === 0 ? (
-                                <p className="empty-state">No registrations yet.</p>
-                            ) : (
-                                <div className="registrations-table">
-                                    <div className="table-header">
-                                        <span>Name</span>
-                                        <span>Event</span>
-                                        <span>College</span>
-                                        <span>Amount</span>
-                                        <span>Status</span>
-                                        <span>Actions</span>
-                                    </div>
-                                    {filteredRegistrations.map(reg => (
-                                        <div
-                                            key={reg.id}
-                                            className="table-row"
-                                            onClick={() => setViewingRegistration(reg)}
-                                        >
-                                            <span className="reg-name">{reg.name}</span>
-                                            <span className="event-name">{reg.eventName}</span>
-                                            <span className="college">{reg.collegeName}</span>
-                                            <span className="amount">₹{reg.amountPaid}</span>
-                                            <span className={`status ${reg.status}`}>{reg.status}</span>
-                                            <span className="actions" onClick={e => e.stopPropagation()}>
-                                                <button
-                                                    className="delete-reg-btn"
-                                                    onClick={() => handleDeleteRegistration(reg.id!)}
-                                                >
-                                                    🗑️
-                                                </button>
-                                            </span>
+                            {/* Day Pass Stats */}
+                            {(() => {
+                                const dpStats = getDayPassRegistrationStats(dayPassRegistrations)
+                                return (
+                                    <div className="stats-grid">
+                                        <div className="stat-card">
+                                            <span className="stat-value">{dpStats.total}</span>
+                                            <span className="stat-label">Total</span>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
+                                        <div className="stat-card pending">
+                                            <span className="stat-value">{dpStats.pending}</span>
+                                            <span className="stat-label">Pending</span>
+                                        </div>
+                                        <div className="stat-card approved">
+                                            <span className="stat-value">{dpStats.approved}</span>
+                                            <span className="stat-label">Approved</span>
+                                        </div>
+                                        <div className="stat-card revenue">
+                                            <span className="stat-value">₹{dpStats.totalRevenue}</span>
+                                            <span className="stat-label">Revenue</span>
+                                        </div>
+                                    </div>
+                                )
+                            })()}
+
+                            {/* Day Pass List */}
+                            <div className="registrations-list">
+                                {dayPassRegistrations.length === 0 ? (
+                                    <p className="empty-state">No day pass registrations yet.</p>
+                                ) : (
+                                    <div className="registrations-table">
+                                        <div className="table-scroll">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Synapse ID</th>
+                                                        <th>Name</th>
+                                                        <th>Email</th>
+                                                        <th>Days</th>
+                                                        <th>College</th>
+                                                        <th>Amount</th>
+                                                        <th>Status</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {dayPassRegistrations.map(reg => (
+                                                        <tr
+                                                            key={reg.id}
+                                                            onClick={() => setViewingDayPassReg(reg)}
+                                                        >
+                                                            <td className="cell-id">{reg.synapseId}</td>
+                                                            <td className="cell-name">{reg.userName}</td>
+                                                            <td className="cell-muted">{reg.email}</td>
+                                                            <td>
+                                                                <span className="cell-days">
+                                                                    {reg.selectedDays.map(d => (
+                                                                        <span key={d} className="day-chip">D{d}</span>
+                                                                    ))}
+                                                                </span>
+                                                            </td>
+                                                            <td className="cell-muted">{reg.college}</td>
+                                                            <td className="cell-amount">₹{reg.totalAmount}</td>
+                                                            <td>
+                                                                <span className={`status-pill ${reg.status}`}>{reg.status}</span>
+                                                            </td>
+                                                            <td onClick={e => e.stopPropagation()}>
+                                                                <button
+                                                                    className="delete-btn"
+                                                                    onClick={async () => {
+                                                                        if (confirm('Delete this registration?')) {
+                                                                            await deleteDayPassRegistration(reg.id!)
+                                                                            fetchData()
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    🗑️
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
             </div>
 
             {/* ================================================
-                EVENT OVERLAY
+                DAY CARDS OVERLAY
                ================================================ */}
-            {activeOverlay === 'event' && (
+            {activeOverlay === 'dayCards' && (
                 <div className="overlay" onClick={() => setActiveOverlay('none')}>
-                    <div className="overlay-content event-overlay" onClick={e => e.stopPropagation()}>
+                    <div className="overlay-content day-cards-overlay" onClick={e => e.stopPropagation()}>
                         <button className="close-overlay" onClick={() => setActiveOverlay('none')}>×</button>
 
-                        <div className="form-section">
-                            <h2 className="form-title">{editingEventId ? 'Edit Event' : 'Add New Event'}</h2>
+                        <h2 className="form-title">Manage Day Pass Cards</h2>
+                        <p className="form-subtitle">Configure the day passes shown on the Events page</p>
 
-                            {/* Name */}
-                            <div className="form-group">
-                                <label>Event Name *</label>
-                                <input
-                                    type="text"
-                                    value={eventForm.name}
-                                    onChange={e => setEventForm(prev => ({ ...prev, name: e.target.value }))}
-                                    placeholder="e.g., Opening Ceremony"
-                                />
-                            </div>
+                        <div className="day-cards-grid">
+                            {[1, 2, 3].map(day => (
+                                <div key={day} className="day-card-form">
+                                    <h3>Day {day}</h3>
 
-                            {/* Description */}
-                            <div className="form-group">
-                                <label>Description *</label>
-                                <textarea
-                                    value={eventForm.description}
-                                    onChange={e => setEventForm(prev => ({ ...prev, description: e.target.value }))}
-                                    placeholder="Brief description of the event"
-                                    rows={3}
-                                />
-                            </div>
-
-                            {/* Date, Time, Venue */}
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Date</label>
-                                    <input
-                                        type="text"
-                                        value={eventForm.date}
-                                        onChange={e => setEventForm(prev => ({ ...prev, date: e.target.value }))}
-                                        placeholder="e.g., 15 Feb 2025"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Time</label>
-                                    <input
-                                        type="text"
-                                        value={eventForm.time}
-                                        onChange={e => setEventForm(prev => ({ ...prev, time: e.target.value }))}
-                                        placeholder="e.g., 10:00 AM"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Venue</label>
-                                <input
-                                    type="text"
-                                    value={eventForm.venue}
-                                    onChange={e => setEventForm(prev => ({ ...prev, venue: e.target.value }))}
-                                    placeholder="e.g., Main Auditorium"
-                                />
-                            </div>
-
-                            {/* Price & Capacity */}
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Entry Fee (₹)</label>
-                                    <input
-                                        type="number"
-                                        value={eventForm.price}
-                                        onChange={e => setEventForm(prev => ({ ...prev, price: Number(e.target.value) }))}
-                                        min="0"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Capacity (0 = unlimited)</label>
-                                    <input
-                                        type="number"
-                                        value={eventForm.capacity}
-                                        onChange={e => setEventForm(prev => ({ ...prev, capacity: Number(e.target.value) }))}
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Icon Selection */}
-                            <div className="form-group">
-                                <label>Icon</label>
-                                <div className="icon-grid">
-                                    {EVENT_ICONS.map(icon => (
-                                        <button
-                                            key={icon}
-                                            type="button"
-                                            className={`icon-btn ${eventForm.icon === icon ? 'active' : ''}`}
-                                            onClick={() => setEventForm(prev => ({ ...prev, icon }))}
-                                        >
-                                            {icon}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Color Selection */}
-                            <div className="form-group">
-                                <label>Accent Color</label>
-                                <div className="color-grid">
-                                    {EVENT_COLORS.map(color => (
-                                        <button
-                                            key={color}
-                                            type="button"
-                                            className={`color-btn ${eventForm.color === color ? 'active' : ''}`}
-                                            style={{ background: color }}
-                                            onClick={() => setEventForm(prev => ({ ...prev, color }))}
+                                    {/* Images */}
+                                    <div className="form-group">
+                                        <label>Images (drag & drop or click to upload)</label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            ref={el => { dayPassImageRefs.current[day] = el }}
+                                            onChange={e => handleDayPassImageUpload(day, e)}
+                                            style={{ display: 'none' }}
                                         />
-                                    ))}
-                                </div>
-                            </div>
 
-                            {/* Images Upload */}
-                            <div className="form-group">
-                                <label>Images</label>
-                                <div className="image-upload-section">
-                                    <input
-                                        type="file"
-                                        ref={imageInputRef}
-                                        accept="image/*"
-                                        multiple
-                                        onChange={handleImageUpload}
-                                        style={{ display: 'none' }}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="upload-btn"
-                                        onClick={() => imageInputRef.current?.click()}
-                                        disabled={imageUploading}
-                                    >
-                                        {imageUploading ? 'Uploading...' : '📷 Add Images'}
-                                    </button>
-                                    {eventForm.images.length > 0 && (
-                                        <div className="image-previews">
-                                            {eventForm.images.map((img, index) => (
-                                                <div key={index} className="image-preview-item">
-                                                    <img src={img} alt={`Preview ${index + 1}`} />
-                                                    <button
-                                                        type="button"
-                                                        className="remove-image-btn"
-                                                        onClick={() => handleRemoveImage(index)}
-                                                    >
-                                                        ×
-                                                    </button>
-                                                </div>
-                                            ))}
+                                        {/* Drag & Drop Zone */}
+                                        <div
+                                            className={`image-drop-zone ${dragActive === day ? 'drag-active' : ''}`}
+                                            onClick={() => dayPassImageRefs.current[day]?.click()}
+                                            onDragOver={e => { e.preventDefault(); setDragActive(day) }}
+                                            onDragLeave={() => setDragActive(null)}
+                                            onDrop={e => handleDayPassImageDrop(day, e)}
+                                        >
+                                            {dayPassImageUploading === day ? (
+                                                <span className="uploading-text">⏳ Uploading...</span>
+                                            ) : (
+                                                <>
+                                                    <span className="drop-icon">📷</span>
+                                                    <span className="drop-text">Drop images here or click to upload</span>
+                                                    <span className="drop-hint">Supports multiple images</span>
+                                                </>
+                                            )}
                                         </div>
-                                    )}
+
+                                        {/* Image Gallery */}
+                                        {dayPassForms[day]?.images?.length > 0 && (
+                                            <div className="image-gallery">
+                                                {dayPassForms[day].images.map((img, idx) => (
+                                                    <div key={idx} className="gallery-item">
+                                                        <img src={img} alt={`Day ${day} image ${idx + 1}`} />
+                                                        <button
+                                                            type="button"
+                                                            className="remove-image-btn"
+                                                            onClick={() => handleRemoveDayPassImage(day, idx)}
+                                                        >
+                                                            ×
+                                                        </button>
+                                                        {idx === 0 && <span className="primary-badge">Primary</span>}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Price */}
+                                    <div className="form-group">
+                                        <label>Price (₹)</label>
+                                        <input
+                                            type="number"
+                                            value={dayPassForms[day]?.price || 0}
+                                            onChange={e => handleDayPassFormChange(day, 'price', Number(e.target.value))}
+                                            min="0"
+                                        />
+                                    </div>
+
+                                    {/* Capacity */}
+                                    <div className="form-group">
+                                        <label>Capacity (0 = unlimited)</label>
+                                        <input
+                                            type="number"
+                                            value={dayPassForms[day]?.capacity || 0}
+                                            onChange={e => handleDayPassFormChange(day, 'capacity', Number(e.target.value))}
+                                            min="0"
+                                            placeholder="e.g., 500"
+                                        />
+                                        {dayPassForms[day]?.capacity > 0 && (
+                                            <span className="capacity-hint">
+                                                {dayPassRegistrations.filter(r => r.selectedDays?.includes(day)).length} / {dayPassForms[day].capacity} seats filled
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Events */}
+                                    <div className="form-group">
+                                        <label>Events (one per line)</label>
+                                        <textarea
+                                            value={dayPassForms[day]?.events || ''}
+                                            onChange={e => handleDayPassFormChange(day, 'events', e.target.value)}
+                                            placeholder="Opening Ceremony&#10;Tech Talks&#10;Workshops"
+                                            rows={4}
+                                        />
+                                    </div>
+
+                                    {/* Active Toggle */}
+                                    <div className="form-group checkbox-group">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={dayPassForms[day]?.isActive ?? true}
+                                                onChange={e => handleDayPassFormChange(day, 'isActive', e.target.checked)}
+                                            />
+                                            Active
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
-
-                            {/* Highlights */}
-                            <div className="form-group">
-                                <label>Highlights (one per line)</label>
-                                <textarea
-                                    value={eventForm.highlights}
-                                    onChange={e => setEventForm(prev => ({ ...prev, highlights: e.target.value }))}
-                                    placeholder="Opening Ceremony&#10;Tech Talks&#10;Networking Session"
-                                    rows={4}
-                                />
-                            </div>
-
-                            {/* Rules */}
-                            <div className="form-group">
-                                <label>Rules & Guidelines</label>
-                                <textarea
-                                    value={eventForm.rules}
-                                    onChange={e => setEventForm(prev => ({ ...prev, rules: e.target.value }))}
-                                    placeholder="Event rules, dress code, etc."
-                                    rows={3}
-                                />
-                            </div>
-
-                            {/* Active Toggle */}
-                            <div className="form-group checkbox-group">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={eventForm.isActive}
-                                        onChange={e => setEventForm(prev => ({ ...prev, isActive: e.target.checked }))}
-                                    />
-                                    Active (visible on public page)
-                                </label>
-                            </div>
-
-                            {eventFormError && (
-                                <p className="form-error">{eventFormError}</p>
-                            )}
-
-                            <button
-                                className="submit-btn"
-                                onClick={handleEventSubmit}
-                                disabled={eventSubmitting || imageUploading}
-                            >
-                                {eventSubmitting
-                                    ? (editingEventId ? 'Saving...' : 'Adding...')
-                                    : (editingEventId ? 'Save Changes' : 'Add Event')}
-                            </button>
+                            ))}
                         </div>
+
+                        <button
+                            className="submit-btn"
+                            onClick={handleSaveDayPasses}
+                            disabled={dayPassSaving || dayPassImageUploading !== null}
+                        >
+                            {dayPassSaving ? 'Saving...' : 'Save All Day Passes'}
+                        </button>
                     </div>
                 </div>
             )}
 
             {/* ================================================
-                REGISTRATION DETAIL OVERLAY
+                VIEW DAY PASS REGISTRATION OVERLAY
                ================================================ */}
-            {viewingRegistration && (
-                <div className="overlay" onClick={() => setViewingRegistration(null)}>
-                    <div className="overlay-content registration-detail-overlay" onClick={e => e.stopPropagation()}>
-                        <button className="close-overlay" onClick={() => setViewingRegistration(null)}>×</button>
+            {viewingDayPassReg && (
+                <div className="overlay" onClick={() => setViewingDayPassReg(null)}>
+                    <div className="overlay-content registration-details" onClick={e => e.stopPropagation()}>
+                        <button className="close-overlay" onClick={() => setViewingDayPassReg(null)}>×</button>
 
-                        <h2>Registration Details</h2>
+                        <h2 className="form-title">🎫 Day Pass Details</h2>
 
-                        <div className="reg-detail-section">
+                        <div className="details-grid">
                             <div className="detail-row">
-                                <label>Event</label>
-                                <span>{viewingRegistration.eventName}</span>
+                                <label>Synapse ID</label>
+                                <span className="synapse-id-badge">{viewingDayPassReg.synapseId}</span>
                             </div>
                             <div className="detail-row">
                                 <label>Name</label>
-                                <span>{viewingRegistration.name}</span>
+                                <span>{viewingDayPassReg.userName}</span>
                             </div>
                             <div className="detail-row">
                                 <label>Email</label>
-                                <span>{viewingRegistration.email}</span>
+                                <span>{viewingDayPassReg.email}</span>
                             </div>
                             <div className="detail-row">
                                 <label>Phone</label>
-                                <span>{viewingRegistration.phone}</span>
+                                <span>{viewingDayPassReg.phone}</span>
                             </div>
                             <div className="detail-row">
                                 <label>College</label>
-                                <span>{viewingRegistration.collegeName}</span>
-                            </div>
-                            {viewingRegistration.synapseId && (
-                                <div className="detail-row">
-                                    <label>Synapse ID</label>
-                                    <span>{viewingRegistration.synapseId}</span>
-                                </div>
-                            )}
-                            <div className="detail-row">
-                                <label>Amount Paid</label>
-                                <span>₹{viewingRegistration.amountPaid}</span>
+                                <span>{viewingDayPassReg.college}</span>
                             </div>
                             <div className="detail-row">
-                                <label>Transaction ID</label>
-                                <span>{viewingRegistration.transactionId || '-'}</span>
-                            </div>
-                            <div className="detail-row">
-                                <label>Status</label>
-                                <span className={`status-badge ${viewingRegistration.status}`}>
-                                    {viewingRegistration.status}
+                                <label>Selected Days</label>
+                                <span className="days-badge">
+                                    {viewingDayPassReg.selectedDays.map(d => `Day ${d}`).join(', ')}
                                 </span>
                             </div>
                             <div className="detail-row">
-                                <label>Registered At</label>
-                                <span>{viewingRegistration.createdAt?.toDate().toLocaleString() || '-'}</span>
+                                <label>Total Amount</label>
+                                <span>₹{viewingDayPassReg.totalAmount}</span>
                             </div>
+                            <div className="detail-row">
+                                <label>Gov ID (Last 4)</label>
+                                <span>{viewingDayPassReg.governmentIdLast4}</span>
+                            </div>
+                            <div className="detail-row">
+                                <label>Registered At</label>
+                                <span>{viewingDayPassReg.createdAt?.toDate().toLocaleString() || '-'}</span>
+                            </div>
+                        </div>
+
+                        {/* Status Controls */}
+                        <div className="admin-controls">
+                            <div className="control-group">
+                                <label>Registration Status</label>
+                                <div className="status-buttons">
+                                    <button
+                                        className={`status-btn pending ${viewingDayPassReg.status === 'pending' ? 'active' : ''}`}
+                                        onClick={async () => {
+                                            await updateDayPassStatus(viewingDayPassReg.id!, 'pending')
+                                            setViewingDayPassReg({ ...viewingDayPassReg, status: 'pending' })
+                                            fetchData()
+                                        }}
+                                    >
+                                        Pending
+                                    </button>
+                                    <button
+                                        className={`status-btn approved ${viewingDayPassReg.status === 'approved' ? 'active' : ''}`}
+                                        onClick={async () => {
+                                            await updateDayPassStatus(viewingDayPassReg.id!, 'approved')
+                                            setViewingDayPassReg({ ...viewingDayPassReg, status: 'approved' })
+                                            fetchData()
+                                        }}
+                                    >
+                                        ✓ Approve
+                                    </button>
+                                    <button
+                                        className={`status-btn rejected ${viewingDayPassReg.status === 'rejected' ? 'active' : ''}`}
+                                        onClick={async () => {
+                                            await updateDayPassStatus(viewingDayPassReg.id!, 'rejected')
+                                            setViewingDayPassReg({ ...viewingDayPassReg, status: 'rejected' })
+                                            fetchData()
+                                        }}
+                                    >
+                                        ✗ Reject
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="control-group">
+                                <label>Payment Status</label>
+                                <div className="status-buttons">
+                                    <button
+                                        className={`status-btn pending ${viewingDayPassReg.paymentStatus === 'pending' ? 'active' : ''}`}
+                                        onClick={async () => {
+                                            await updateDayPassPaymentStatus(viewingDayPassReg.id!, 'pending')
+                                            setViewingDayPassReg({ ...viewingDayPassReg, paymentStatus: 'pending' })
+                                            fetchData()
+                                        }}
+                                    >
+                                        Pending
+                                    </button>
+                                    <button
+                                        className={`status-btn approved ${viewingDayPassReg.paymentStatus === 'paid' ? 'active' : ''}`}
+                                        onClick={async () => {
+                                            await updateDayPassPaymentStatus(viewingDayPassReg.id!, 'paid')
+                                            setViewingDayPassReg({ ...viewingDayPassReg, paymentStatus: 'paid' })
+                                            fetchData()
+                                        }}
+                                    >
+                                        ✓ Paid
+                                    </button>
+                                    <button
+                                        className={`status-btn free ${viewingDayPassReg.paymentStatus === 'free' ? 'active' : ''}`}
+                                        onClick={async () => {
+                                            await updateDayPassPaymentStatus(viewingDayPassReg.id!, 'free')
+                                            setViewingDayPassReg({ ...viewingDayPassReg, paymentStatus: 'free' })
+                                            fetchData()
+                                        }}
+                                    >
+                                        Free
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Danger Zone */}
+                        <div className="danger-zone">
+                            <button
+                                className="delete-registration-btn"
+                                onClick={async () => {
+                                    if (confirm('Are you sure you want to delete this registration? This cannot be undone.')) {
+                                        await deleteDayPassRegistration(viewingDayPassReg.id!)
+                                        setViewingDayPassReg(null)
+                                        fetchData()
+                                    }
+                                }}
+                            >
+                                🗑️ Delete Registration
+                            </button>
                         </div>
                     </div>
                 </div>

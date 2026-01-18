@@ -5,7 +5,7 @@ import { onAuthChange } from '../../lib/auth'
 import { logout } from '../../utils/auth'
 import { getUserOrAdminDocument, type UserDocument, type AdminDocument } from '../../lib/userService'
 import './Navbar.css'
-import logoImage from '../../assets/logos/logo.png'
+import logoImage from '../../assets/logos/Logo1.png'
 
 type NavItem = {
     label: string
@@ -48,9 +48,9 @@ export default function Navbar() {
 
     useEffect(() => {
         const handleScroll = () => {
-            setScrolled(window.scrollY > 20)
+            setScrolled(window.scrollY > 50)
         }
-        window.addEventListener('scroll', handleScroll)
+        window.addEventListener('scroll', handleScroll, { passive: true })
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
@@ -170,7 +170,7 @@ export default function Navbar() {
     const userInitial = userData?.displayName?.charAt(0).toUpperCase() || 'U'
 
     return (
-        <nav className="navbar-container">
+        <nav className={`navbar-container ${scrolled ? 'scrolled' : ''}`}>
             <div className={`navbar-inner ${scrolled ? 'scrolled' : ''}`}>
                 {/* Logo */}
                 <div className="navbar-logo" onClick={() => navigate('/')}>

@@ -27,6 +27,8 @@ const ManageQueries = lazy(() => import('./public/manage-queries/ManageQueries')
 const ManageSponsors = lazy(() => import('./public/manage-sponsors/ManageSponsors'))
 const ManageCompetitions = lazy(() => import('./public/manage-competitions/ManageCompetitions'))
 const ManageEvents = lazy(() => import('./public/manage-events/ManageEvents'))
+const ManageQRVerification = lazy(() => import('./public/manage-qr-verification/ManageQRVerification'))
+const VolunteerScanner = lazy(() => import('./public/volunteer-scanner/VolunteerScanner'))
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -100,6 +102,8 @@ function App() {
                       <Route path="/manage-sponsors" element={<ManageSponsors />} />
                       <Route path="/manage-competitions" element={<ManageCompetitions />} />
                       <Route path="/manage-events" element={<ManageEvents />} />
+                      <Route path="/manage-qr-verification" element={<ManageQRVerification />} />
+                      <Route path="/scan-qr" element={<VolunteerScanner />} />
                     </Routes>
                   </Suspense>
                 </div>
