@@ -20,7 +20,21 @@ export default function Hero() {
                     <div className="hero-description">
                         <p>Step into the future of technology at ZCOER's official technical festival.</p>
                         <p>Synapse '26 brings together innovation, autonomy, agents, robotics, design, engineering, and the wildest ideas students can imagine — all under one electrifying roof.</p>
-                        <p>Experience workshops, competitions, showcases, team opportunities, and an unforgettable celebration of the tech culture.</p>
+                    </div>
+
+                    <div className="hero-cta-buttons">
+                        <button
+                            className="cta-btn primary"
+                            onClick={() => navigate('/events')}
+                        >
+                            🎫 Register Now
+                        </button>
+                        <button
+                            className="cta-btn secondary"
+                            onClick={() => navigate('/synapse-schedule')}
+                        >
+                            📅 View Schedule
+                        </button>
                     </div>
                 </div>
 

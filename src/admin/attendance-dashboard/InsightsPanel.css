@@ -1,0 +1,316 @@
+/* ✨ PHASE 3: Smart Insights Panel */
+
+.insights-panel {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.insights-panel h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00ff88, #00d4ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2rem;
+}
+
+.no-data {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.3);
+    padding: 2rem;
+    font-size: 1.1rem;
+}
+
+/* Insight Sections */
+.insight-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.insight-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.insight-section h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+}
+
+/* Trend Card */
+.trend-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.trend-indicator {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.trend-info {
+    flex: 1;
+}
+
+.trend-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.25rem;
+}
+
+.trend-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #00ff88;
+    text-transform: capitalize;
+}
+
+/* Peak Info */
+.peak-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.peak-item {
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.peak-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.peak-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Volunteers List */
+.volunteers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.volunteer-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.volunteer-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(0, 255, 136, 0.2);
+}
+
+.volunteer-rank {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 255, 136, 0.1);
+    border-radius: 50%;
+    font-weight: 700;
+    color: #00ff88;
+    font-size: 1rem;
+}
+
+.volunteer-info {
+    flex: 1;
+}
+
+.volunteer-name {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.25rem;
+}
+
+.volunteer-stats {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Payment Breakdown */
+.payment-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.payment-stat {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.payment-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.5rem;
+}
+
+.payment-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.payment-value.success {
+    color: #00ff88;
+}
+
+.payment-value.warning {
+    color: #ffb432;
+}
+
+.payment-value.info {
+    color: #00d4ff;
+}
+
+.payment-percentage {
+    margin-top: 1rem;
+}
+
+.percentage-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.percentage-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00ff88, #00d4ff);
+    transition: width 0.6s ease;
+}
+
+.percentage-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+}
+
+/* Anomalies */
+.anomalies-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.anomaly-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid;
+}
+
+.anomaly-item.severity-high {
+    background: rgba(255, 68, 68, 0.1);
+    border-color: rgba(255, 68, 68, 0.3);
+}
+
+.anomaly-item.severity-medium {
+    background: rgba(255, 180, 50, 0.1);
+    border-color: rgba(255, 180, 50, 0.3);
+}
+
+.anomaly-item.severity-low {
+    background: rgba(0, 255, 136, 0.1);
+    border-color: rgba(0, 255, 136, 0.3);
+}
+
+.anomaly-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.anomaly-text {
+    flex: 1;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+}
+
+/* Prediction */
+.prediction-card {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 212, 255, 0.1));
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.prediction-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.75rem;
+}
+
+.prediction-value {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00ff88, #00d4ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .insights-panel {
+        padding: 1.5rem;
+    }
+
+    .insights-panel h2 {
+        font-size: 1.5rem;
+    }
+
+    .trend-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .trend-indicator {
+        font-size: 2.5rem;
+    }
+
+    .peak-info {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-breakdown {
+        grid-template-columns: 1fr;
+    }
+}

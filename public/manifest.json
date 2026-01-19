@@ -31,6 +31,30 @@
     "screenshots": [],
     "shortcuts": [
         {
+            "name": "QR Scanner",
+            "short_name": "Scanner",
+            "description": "Scan QR codes for attendance",
+            "url": "/scan-qr",
+            "icons": [
+                {
+                    "src": "/logo.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Attendance Dashboard",
+            "short_name": "Attendance",
+            "description": "View attendance analytics",
+            "url": "/admin/attendance",
+            "icons": [
+                {
+                    "src": "/logo.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
             "name": "Events",
             "short_name": "Events",
             "description": "View upcoming events",

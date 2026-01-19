@@ -29,6 +29,8 @@ const ManageCompetitions = lazy(() => import('./public/manage-competitions/Manag
 const ManageEvents = lazy(() => import('./public/manage-events/ManageEvents'))
 const ManageQRVerification = lazy(() => import('./public/manage-qr-verification/ManageQRVerification'))
 const VolunteerScanner = lazy(() => import('./public/volunteer-scanner/VolunteerScanner'))
+const AttendanceDashboard = lazy(() => import('./admin/attendance-dashboard/AttendanceDashboard'))
+const Schedule = lazy(() => import('./public/schedule/Schedule'))
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -63,9 +65,9 @@ function App() {
                 />
               </div>
 
-              {/* Content layer - on top with transparent backgrounds */}
-              <div style={{ position: 'relative', zIndex: 1, pointerEvents: 'none' }}>
-                <div style={{ pointerEvents: 'auto' }}>
+              {/* Content layer - above background */}
+              <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', flexDirection: 'column', pointerEvents: 'none' }}>
+                <div style={{ flex: 1, pointerEvents: 'auto' }}>
                   <Suspense fallback={<PageLoader />}>
                     <Routes>
                       <Route path="/" element={<Home />} />
@@ -104,6 +106,8 @@ function App() {
                       <Route path="/manage-events" element={<ManageEvents />} />
                       <Route path="/manage-qr-verification" element={<ManageQRVerification />} />
                       <Route path="/scan-qr" element={<VolunteerScanner />} />
+                      <Route path="/admin/attendance" element={<AttendanceDashboard />} />
+                      <Route path="/synapse-schedule" element={<Schedule />} />
                     </Routes>
                   </Suspense>
                 </div>

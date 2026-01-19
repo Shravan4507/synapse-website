@@ -29,9 +29,12 @@ export interface QRVolunteer {
     displayName: string
     email: string
     assignedEvents?: string[]  // Event IDs they can scan for
+    allowedEventTypes?: ('daypass' | 'competition' | 'event')[]  // Types of events they can scan
     isActive: boolean
     createdAt?: Timestamp
     createdBy?: string  // Admin who added them
+    lastActiveAt?: Timestamp  // Last time they scanned
+    totalScans?: number  // Total scans performed
 }
 
 export interface Attendance {
@@ -48,12 +51,24 @@ export interface Attendance {
     scannedAt: Timestamp
     syncedAt?: Timestamp
     offlineScanned: boolean
+    // Event-specific tracking
+    eventId?: string       // Specific event if applicable
+    eventType?: string     // daypass, competition, event
+    eventName?: string
+    // Payment verification
+    paymentStatus?: 'pending' | 'paid' | 'free'
+    paymentVerified?: boolean
     // Registration info from QR
     registrations?: {
         type: string
         id: string
         name: string
     }[]
+    // Audit fields
+    notes?: string
+    editedBy?: string
+    editedAt?: Timestamp
+    deviceInfo?: string    // Device used for scanning
 }
 
 export interface AttendanceRecord {
@@ -61,6 +76,29 @@ export interface AttendanceRecord {
     userId: string
     synapseId: string
     displayName: string
+}
+
+// Offline queue item
+export interface OfflineQueueItem {
+    id: string             // Local UUID
+    attendance: Omit<Attendance, 'id' | 'syncedAt'>
+    timestamp: number      // When it was queued
+    retryCount: number
+    lastError?: string
+}
+
+// Audit log entry
+export interface AuditLog {
+    id?: string
+    action: 'create' | 'update' | 'delete' | 'scan'
+    entityType: 'attendance' | 'volunteer' | 'settings'
+    entityId: string
+    performedBy: string    // User ID
+    performedByName: string
+    timestamp: Timestamp
+    details: Record<string, any>
+    ipAddress?: string
+    userAgent?: string
 }
 
 // ========================================
@@ -319,6 +357,196 @@ export const deleteAttendance = async (attendanceId: string): Promise<{ success:
     }
 }
 
+/**
+ * Update an attendance record
+ */
+export const updateAttendance = async (
+    attendanceId: string,
+    updates: Partial<Omit<Attendance, 'id' | 'scannedAt'>>
+): Promise<{ success: boolean; error?: string }> => {
+    try {
+        await updateDoc(doc(db, 'attendances', attendanceId), updates)
+        return { success: true }
+    } catch (error) {
+        console.error('Error updating attendance:', error)
+        return { success: false, error: 'Failed to update attendance' }
+    }
+}
+
+/**
+ * Add manual attendance (for admin use)
+ */
+export const addManualAttendance = async (
+    attendance: Omit<Attendance, 'id' | 'scannedAt' | 'syncedAt'>
+): Promise<{ success: boolean; id?: string; error?: string }> => {
+    try {
+        const docRef = await addDoc(collection(db, 'attendances'), {
+            ...attendance,
+            scannedAt: serverTimestamp(),
+            syncedAt: serverTimestamp()
+        })
+        return { success: true, id: docRef.id }
+    } catch (error) {
+        console.error('Error adding manual attendance:', error)
+        return { success: false, error: 'Failed to add attendance' }
+    }
+}
+
+// ========================================
+// PAYMENT VERIFICATION
+// ========================================
+
+/**
+ * Check payment status for a user's registration
+ */
+export const checkPaymentStatus = async (
+    userId: string,
+    registrationType: 'daypass' | 'competition' | 'event',
+    registrationId: string
+): Promise<{ verified: boolean; status: 'pending' | 'paid' | 'free'; error?: string }> => {
+    try {
+        let collectionName = ''
+
+        switch (registrationType) {
+            case 'daypass':
+                collectionName = 'day_pass_registrations'
+                break
+            case 'competition':
+                collectionName = 'registrations'
+                break
+            case 'event':
+                collectionName = 'event_registrations'
+                break
+        }
+
+        const q = query(
+            collection(db, collectionName),
+            where('userId', '==', userId)
+        )
+        const snapshot = await getDocs(q)
+
+        if (snapshot.empty) {
+            return { verified: false, status: 'pending', error: 'Registration not found' }
+        }
+
+        const registration = snapshot.docs[0].data()
+        const paymentStatus = registration.paymentStatus || 'pending'
+        const totalAmount = registration.totalAmount || 0
+
+        // Free registrations are auto-verified
+        if (totalAmount === 0) {
+            return { verified: true, status: 'free' }
+        }
+
+        // Check if payment is confirmed
+        const verified = paymentStatus === 'paid'
+
+        return { verified, status: paymentStatus }
+    } catch (error) {
+        console.error('Error checking payment status:', error)
+        return { verified: false, status: 'pending', error: 'Failed to verify payment' }
+    }
+}
+
+/**
+ * Verify all payments for a user's registrations
+ */
+export const verifyAllPayments = async (
+    userId: string,
+    registrations: { type: string; id: string; name: string }[]
+): Promise<{ allVerified: boolean; details: Record<string, any> }> => {
+    const results: Record<string, any> = {}
+    let allVerified = true
+
+    for (const reg of registrations) {
+        const result = await checkPaymentStatus(userId, reg.type as any, reg.id)
+        results[reg.id] = result
+
+        if (!result.verified) {
+            allVerified = false
+        }
+    }
+
+    return { allVerified, details: results }
+}
+
+// ========================================
+// EVENT-SPECIFIC VALIDATION
+// ======================================== 
+
+/**
+ * Check if volunteer is authorized to scan for a specific event
+ */
+export const canVolunteerScanEvent = async (
+    volunteerSynapseId: string,
+    eventId?: string,
+    eventType?: string
+): Promise<{ authorized: boolean; reason?: string }> => {
+    try {
+        const q = query(
+            collection(db, 'qr_volunteers'),
+            where('synapseId', '==', volunteerSynapseId),
+            where('isActive', '==', true)
+        )
+        const snapshot = await getDocs(q)
+
+        if (snapshot.empty) {
+            return { authorized: false, reason: 'Volunteer not found or inactive' }
+        }
+
+        const volunteer = snapshot.docs[0].data() as QRVolunteer
+
+        // If no event restrictions, allow all
+        if (!volunteer.assignedEvents && !volunteer.allowedEventTypes) {
+            return { authorized: true }
+        }
+
+        // Check event ID restriction
+        if (eventId && volunteer.assignedEvents) {
+            if (!volunteer.assignedEvents.includes(eventId)) {
+                return { authorized: false, reason: 'Not assigned to this event' }
+            }
+        }
+
+        // Check event type restriction
+        if (eventType && volunteer.allowedEventTypes) {
+            if (!volunteer.allowedEventTypes.includes(eventType as any)) {
+                return { authorized: false, reason: `Not authorized for ${eventType} scans` }
+            }
+        }
+
+        return { authorized: true }
+    } catch (error) {
+        console.error('Error checking volunteer authorization:', error)
+        return { authorized: false, reason: 'Authorization check failed' }
+    }
+}
+
+/**
+ * Update volunteer scan statistics
+ */
+export const updateVolunteerStats = async (volunteerSynapseId: string): Promise<void> => {
+    try {
+        const q = query(
+            collection(db, 'qr_volunteers'),
+            where('synapseId', '==', volunteerSynapseId)
+        )
+        const snapshot = await getDocs(q)
+
+        if (!snapshot.empty) {
+            const volunteerDoc = snapshot.docs[0]
+            const currentScans = volunteerDoc.data().totalScans || 0
+
+            await updateDoc(doc(db, 'qr_volunteers', volunteerDoc.id), {
+                totalScans: currentScans + 1,
+                lastActiveAt: serverTimestamp()
+            })
+        }
+    } catch (error) {
+        console.error('Error updating volunteer stats:', error)
+    }
+}
+
 // ========================================
 // STATISTICS
 // ========================================
@@ -417,6 +645,7 @@ export const lookupUserBySynapseId = async (synapseId: string): Promise<{
     displayName: string
     email: string
     synapseId: string
+    college?: string
 } | null> => {
     try {
         // Check users collection
@@ -432,7 +661,8 @@ export const lookupUserBySynapseId = async (synapseId: string): Promise<{
                 userId: userSnapshot.docs[0].id,
                 displayName: userData.displayName || '',
                 email: userData.email || '',
-                synapseId: userData.synapseId
+                synapseId: userData.synapseId,
+                college: userData.college
             }
         }
 
@@ -449,7 +679,8 @@ export const lookupUserBySynapseId = async (synapseId: string): Promise<{
                 userId: adminSnapshot.docs[0].id,
                 displayName: adminData.displayName || '',
                 email: adminData.email || '',
-                synapseId: adminData.synapseId
+                synapseId: adminData.synapseId,
+                college: adminData.college
             }
         }
 

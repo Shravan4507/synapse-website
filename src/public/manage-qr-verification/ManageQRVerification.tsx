@@ -12,6 +12,8 @@ import {
     getAllAttendance,
     getAttendanceByDate,
     deleteAttendance,
+    updateAttendance,
+    addManualAttendance,
     getAttendanceStats,
     exportAttendanceToCSV,
     downloadAttendanceCSV,
@@ -51,6 +53,25 @@ export default function ManageQRVerification() {
     } | null>(null)
     const [searchError, setSearchError] = useState('')
     const [addingVolunteer, setAddingVolunteer] = useState(false)
+
+    // Attendance CRUD state
+    const [selectedAttendance, setSelectedAttendance] = useState<Attendance | null>(null)
+    const [showAttendanceDetail, setShowAttendanceDetail] = useState(false)
+    const [showEditAttendance, setShowEditAttendance] = useState(false)
+    const [showAddAttendance, setShowAddAttendance] = useState(false)
+    const [editNote, setEditNote] = useState('')
+    const [savingAttendance, setSavingAttendance] = useState(false)
+
+    // Manual add attendance state
+    const [manualSynapseId, setManualSynapseId] = useState('')
+    const [manualUserResult, setManualUserResult] = useState<{
+        userId: string
+        displayName: string
+        email: string
+        synapseId: string
+    } | null>(null)
+    const [manualSearchError, setManualSearchError] = useState('')
+    const [manualNote, setManualNote] = useState('')
 
     // ========================================
     // DATA FETCHING
@@ -181,11 +202,84 @@ export default function ManageQRVerification() {
         await fetchData()
     }
 
+    const handleViewAttendance = (attendance: Attendance) => {
+        setSelectedAttendance(attendance)
+        setShowAttendanceDetail(true)
+    }
+
+    const handleEditAttendance = (attendance: Attendance) => {
+        setSelectedAttendance(attendance)
+        setEditNote((attendance as Attendance & { notes?: string }).notes || '')
+        setShowEditAttendance(true)
+    }
+
+    const handleSaveAttendance = async () => {
+        if (!selectedAttendance?.id) return
+        setSavingAttendance(true)
+
+        await updateAttendance(selectedAttendance.id, {
+            notes: editNote
+        } as Partial<Attendance>)
+
+        setSavingAttendance(false)
+        setShowEditAttendance(false)
+        setSelectedAttendance(null)
+        await fetchData()
+    }
+
+    const handleSearchManualUser = async () => {
+        setManualSearchError('')
+        setManualUserResult(null)
+
+        if (!manualSynapseId.trim()) {
+            setManualSearchError('Please enter a Synapse ID')
+            return
+        }
+
+        const result = await lookupUserBySynapseId(manualSynapseId.trim().toUpperCase())
+        if (result) {
+            setManualUserResult(result)
+        } else {
+            setManualSearchError('No user found with this Synapse ID')
+        }
+    }
+
+    const handleAddManualAttendance = async () => {
+        if (!manualUserResult) return
+        setSavingAttendance(true)
+
+        const result = await addManualAttendance({
+            userId: manualUserResult.userId,
+            synapseId: manualUserResult.synapseId,
+            displayName: manualUserResult.displayName,
+            email: manualUserResult.email,
+            date: getTodayDate(),
+            attended: true,
+            scannedBy: 'ADMIN',
+            scannedByName: 'Manual Entry',
+            offlineScanned: false,
+            notes: manualNote
+        } as Omit<Attendance, 'id' | 'scannedAt' | 'syncedAt'>)
+
+        setSavingAttendance(false)
+
+        if (result.success) {
+            setShowAddAttendance(false)
+            setManualSynapseId('')
+            setManualUserResult(null)
+            setManualNote('')
+            await fetchData()
+        } else {
+            setManualSearchError(result.error || 'Failed to add attendance')
+        }
+    }
+
     const stats = getAttendanceStats(filteredAttendances)
     const todayStats = getAttendanceStats(todayAttendances)
 
     // Get unique dates for filter
     const uniqueDates = [...new Set(attendances.map(a => a.date))].sort().reverse()
+
 
     // ========================================
     // RENDER
@@ -204,13 +298,24 @@ export default function ManageQRVerification() {
             <div className="manage-qr-content">
                 {/* Header */}
                 <div className="qr-header">
-                    <button className="back-btn" onClick={() => navigate('/user-dashboard')}>
-                        ← Back
-                    </button>
-                    <h1 className="manage-title">QR Verification</h1>
-                    <p className="manage-subtitle">
-                        {volunteers.filter(v => v.isActive).length} active volunteers • {todayAttendances.length} checked in today
-                    </p>
+                    <div className="header-left">
+                        <button className="back-btn" onClick={() => navigate('/user-dashboard')}>
+                            ← Back
+                        </button>
+                        <button
+                            className="dashboard-btn"
+                            onClick={() => navigate('/admin/attendance')}
+                            title="View Attendance Dashboard"
+                        >
+                            📊 Dashboard
+                        </button>
+                    </div>
+                    <div className="header-content">
+                        <h1 className="manage-title">QR Verification</h1>
+                        <p className="manage-subtitle">
+                            {volunteers.filter(v => v.isActive).length} active volunteers • {todayAttendances.length} checked in today
+                        </p>
+                    </div>
                 </div>
 
                 {/* Tabs */}
@@ -345,17 +450,25 @@ export default function ManageQRVerification() {
                     <div className="attendance-section">
                         {/* Toolbar */}
                         <div className="attendance-toolbar">
-                            <div className="filter-section">
-                                <label>Filter by Date:</label>
-                                <select
-                                    value={selectedDate}
-                                    onChange={e => setSelectedDate(e.target.value)}
+                            <div className="toolbar-left">
+                                <div className="filter-section">
+                                    <label>Filter by Date:</label>
+                                    <select
+                                        value={selectedDate}
+                                        onChange={e => setSelectedDate(e.target.value)}
+                                    >
+                                        <option value="all">All Dates</option>
+                                        {uniqueDates.map(date => (
+                                            <option key={date} value={date}>{date}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <button
+                                    className="action-btn primary"
+                                    onClick={() => setShowAddAttendance(true)}
                                 >
-                                    <option value="all">All Dates</option>
-                                    {uniqueDates.map(date => (
-                                        <option key={date} value={date}>{date}</option>
-                                    ))}
-                                </select>
+                                    + Add Manual Entry
+                                </button>
                             </div>
                             <button
                                 className="export-btn"
@@ -414,8 +527,23 @@ export default function ManageQRVerification() {
                                             </span>
                                             <span className="actions">
                                                 <button
-                                                    className="delete-btn"
+                                                    className="action-icon-btn view"
+                                                    onClick={() => handleViewAttendance(record)}
+                                                    title="View Details"
+                                                >
+                                                    👁️
+                                                </button>
+                                                <button
+                                                    className="action-icon-btn edit"
+                                                    onClick={() => handleEditAttendance(record)}
+                                                    title="Edit"
+                                                >
+                                                    ✏️
+                                                </button>
+                                                <button
+                                                    className="action-icon-btn delete"
                                                     onClick={() => handleDeleteAttendance(record.id!)}
+                                                    title="Delete"
                                                 >
                                                     🗑️
                                                 </button>
@@ -425,6 +553,173 @@ export default function ManageQRVerification() {
                                 </>
                             )}
                         </div>
+
+                        {/* View Attendance Detail Modal */}
+                        {showAttendanceDetail && selectedAttendance && (
+                            <div className="overlay" onClick={() => setShowAttendanceDetail(false)}>
+                                <div className="overlay-content" onClick={e => e.stopPropagation()}>
+                                    <button className="close-overlay" onClick={() => setShowAttendanceDetail(false)}>×</button>
+                                    <h2>Attendance Details</h2>
+
+                                    <div className="detail-grid">
+                                        <div className="detail-row">
+                                            <span className="detail-label">Synapse ID</span>
+                                            <span className="detail-value synapse-id">{selectedAttendance.synapseId}</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Name</span>
+                                            <span className="detail-value">{selectedAttendance.displayName}</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Email</span>
+                                            <span className="detail-value">{selectedAttendance.email || '-'}</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">College</span>
+                                            <span className="detail-value">{selectedAttendance.college || '-'}</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Date</span>
+                                            <span className="detail-value">{selectedAttendance.date}</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Time</span>
+                                            <span className="detail-value">
+                                                {selectedAttendance.scannedAt?.toDate?.()?.toLocaleTimeString('en-IN') || '-'}
+                                            </span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Scanned By</span>
+                                            <span className="detail-value">{selectedAttendance.scannedByName} ({selectedAttendance.scannedBy})</span>
+                                        </div>
+                                        {selectedAttendance.registrations && selectedAttendance.registrations.length > 0 && (
+                                            <div className="detail-row full-width">
+                                                <span className="detail-label">Registrations</span>
+                                                <div className="registrations-list">
+                                                    {selectedAttendance.registrations.map((reg, i) => (
+                                                        <span key={i} className="reg-tag">
+                                                            {reg.type === 'daypass' ? '🎫' : reg.type === 'competition' ? '🏆' : '🎉'} {reg.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="modal-actions">
+                                        <button className="action-btn secondary" onClick={() => {
+                                            setShowAttendanceDetail(false)
+                                            handleEditAttendance(selectedAttendance)
+                                        }}>
+                                            ✏️ Edit
+                                        </button>
+                                        <button className="action-btn danger" onClick={() => {
+                                            setShowAttendanceDetail(false)
+                                            handleDeleteAttendance(selectedAttendance.id!)
+                                        }}>
+                                            🗑️ Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Edit Attendance Modal */}
+                        {showEditAttendance && selectedAttendance && (
+                            <div className="overlay" onClick={() => setShowEditAttendance(false)}>
+                                <div className="overlay-content" onClick={e => e.stopPropagation()}>
+                                    <button className="close-overlay" onClick={() => setShowEditAttendance(false)}>×</button>
+                                    <h2>Edit Attendance</h2>
+
+                                    <div className="edit-form">
+                                        <div className="form-info">
+                                            <span className="info-label">{selectedAttendance.displayName}</span>
+                                            <span className="info-id">{selectedAttendance.synapseId}</span>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Notes</label>
+                                            <textarea
+                                                value={editNote}
+                                                onChange={e => setEditNote(e.target.value)}
+                                                placeholder="Add notes about this attendance..."
+                                                rows={3}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="modal-actions">
+                                        <button
+                                            className="action-btn secondary"
+                                            onClick={() => setShowEditAttendance(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            className="action-btn primary"
+                                            onClick={handleSaveAttendance}
+                                            disabled={savingAttendance}
+                                        >
+                                            {savingAttendance ? 'Saving...' : 'Save Changes'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Add Manual Attendance Modal */}
+                        {showAddAttendance && (
+                            <div className="overlay" onClick={() => setShowAddAttendance(false)}>
+                                <div className="overlay-content" onClick={e => e.stopPropagation()}>
+                                    <button className="close-overlay" onClick={() => setShowAddAttendance(false)}>×</button>
+                                    <h2>Add Manual Attendance</h2>
+
+                                    <div className="search-section">
+                                        <label>Search User by Synapse ID</label>
+                                        <div className="search-row">
+                                            <input
+                                                type="text"
+                                                value={manualSynapseId}
+                                                onChange={e => setManualSynapseId(e.target.value.toUpperCase())}
+                                                placeholder="e.g., SYN-ABC-1234"
+                                            />
+                                            <button onClick={handleSearchManualUser}>Search</button>
+                                        </div>
+                                        {manualSearchError && <p className="search-error">{manualSearchError}</p>}
+                                    </div>
+
+                                    {manualUserResult && (
+                                        <div className="manual-add-form">
+                                            <div className="search-result">
+                                                <div className="result-info">
+                                                    <span className="result-name">{manualUserResult.displayName}</span>
+                                                    <span className="result-email">{manualUserResult.email}</span>
+                                                    <span className="result-id">{manualUserResult.synapseId}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Notes (Optional)</label>
+                                                <textarea
+                                                    value={manualNote}
+                                                    onChange={e => setManualNote(e.target.value)}
+                                                    placeholder="e.g., Added manually - forgot QR code"
+                                                    rows={2}
+                                                />
+                                            </div>
+
+                                            <button
+                                                className="add-btn full-width"
+                                                onClick={handleAddManualAttendance}
+                                                disabled={savingAttendance}
+                                            >
+                                                {savingAttendance ? 'Adding...' : '✓ Mark as Present'}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
