@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap');
+
 .events-page {
     min-height: 100vh;
     display: flex;
@@ -15,377 +17,883 @@
 }
 
 .events-title {
+    font-family: "Fredericka the Great", serif;
     font-size: 4rem;
-    font-weight: 800;
+    font-weight: 400;
+    font-style: normal;
     background: linear-gradient(135deg, #ff00ff, #00d4ff, #00ff88);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 0.5rem;
+    margin-bottom: 2rem;
     animation: fadeInUp 0.6s ease-out;
 }
 
-.events-subtitle {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 0.75rem;
-    animation: fadeInUp 0.7s ease-out;
-}
-
-.events-info {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.5);
-    max-width: 600px;
-    margin: 0 auto 3rem;
-    line-height: 1.6;
-    animation: fadeInUp 0.8s ease-out;
-}
-
 /* ========================================
-   DAY PASS CARDS CONTAINER
+   EVENTS GRID - 3 COLUMNS
    ======================================== */
-.day-passes-container {
+.events-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    margin-bottom: 3rem;
-}
-
-/* ========================================
-   DAY PASS CARD - NEW DESIGN
-   ======================================== */
-.day-pass-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 24px;
-    backdrop-filter: blur(12px);
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    animation: fadeInUp 0.5s ease-out backwards;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.day-pass-card.selected {
-    border-color: rgba(0, 212, 255, 0.2);
-    background: rgba(0, 212, 255, 0.02);
-}
-
-.day-pass-card.disabled {
-    opacity: 0.60;
-    pointer-events: none;
-    /* Allow hover but button is disabled */
-}
-
-/* Status Badges */
-.pass-status-badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.35rem 0.75rem;
-    border-radius: 24px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    z-index: 2;
-}
-
-.pass-status-badge.sold-out {
-    background: rgba(255, 70, 70, 0.2);
-    color: #ff6b6b;
-    border: 1px solid rgba(255, 70, 70, 0.4);
-}
-
-.pass-status-badge.few-spots {
-    background: rgba(255, 180, 50, 0.2);
-    color: #ffb432;
-    border: 1px solid rgba(255, 180, 50, 0.4);
-    animation: pulse 2s ease-in-out infinite;
-}
-
-.pass-status-badge.registered {
-    background: rgba(0, 255, 136, 0.15);
-    color: #00ff88;
-    border: 1px solid rgba(0, 255, 136, 0.4);
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
-}
-
-/* Seats Info */
-.pass-seats-info {
-    font-size: 0.75rem;
-    color: rgba(255, 180, 50, 0.8);
-    text-align: center;
-    margin-bottom: 0.75rem;
-    font-weight: 500;
-}
-
-/* Image Area */
-.pass-image-area {
     width: 100%;
-    aspect-ratio: 4 / 3;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.event-column {
+    min-height: 450px;
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
     overflow: hidden;
-    margin-bottom: 1.25rem;
-    position: relative;
-}
-
-.pass-image-area img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.pass-image-placeholder {
-    width: 100%;
-    height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.15);
-    font-size: 1.25rem;
-    font-weight: 500;
-    font-style: italic;
+    flex-direction: column;
+    padding-bottom: 2rem;
+    animation: fadeInUp 0.8s ease-out backwards;
+    transition: border-color 0.3s ease;
 }
 
-/* Image Carousel */
-.image-carousel {
-    position: relative;
-    width: 100%;
-    height: 100%;
+.event-column.selected {
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
-.carousel-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+.event-column.registered {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
-.carousel-image.active {
-    opacity: 1;
+.event-column.registered .btn-explore {
+    pointer-events: auto;
 }
 
-/* Carousel Dots */
-.carousel-dots {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 6px;
-    z-index: 2;
-}
-
-.carousel-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, 0.4);
-    cursor: pointer;
-    padding: 0;
-    transition: all 0.2s ease;
-}
-
-.carousel-dot:hover {
-    background: rgba(255, 255, 255, 0.7);
-}
-
-.carousel-dot.active {
-    background: rgba(0, 212, 255, 0.9);
-    transform: scale(1.1);
-}
-
-
-/* Day Title Section */
-.pass-day-section {
-    text-align: left;
-    margin-bottom: 0.75rem;
-}
-
-.pass-day-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: white;
-    margin: 0 0 0.5rem 0;
-    letter-spacing: 2px;
-}
-
-
-.pass-title-underline {
-    width: 50px;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.3);
-}
-
-/* Events List */
-.pass-events-list {
-    text-align: left;
-    flex: 1;
-    margin-bottom: 1rem;
-}
-
-.pass-event-item {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin: 0.35rem 0;
-    font-style: italic;
-}
-
-/* Divider */
-.pass-divider {
-    width: 100%;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 0.75rem 0;
-}
-
-/* Price Row */
-.pass-price-row {
-    display: flex;
-    justify-content: flex-end;
-    align-items: baseline;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.pass-price-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
-    letter-spacing: 1px;
-}
-
-.pass-price-value {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: white;
-}
-
-.day-pass-card.selected .pass-price-value {
-    color: #00d4ff;
-}
-
-/* Select Button */
-.pass-select-button {
-    width: 100%;
-    padding: 0.75rem 1.5rem;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 24px;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.pass-select-button:active:not(.disabled) {
-    transform: scale(0.98);
-}
-
-.pass-select-button.selected {
-    background: rgba(0, 212, 255, 0.15);
-    border-color: rgba(0, 212, 255, 0.1);
-    color: #00d4ff;
-}
-
-.pass-select-button.disabled {
-    border-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.3);
+.btn-select.registered {
+    background: rgba(80, 249, 97, 0.1);
+    color: rgb(80, 249, 97);
+    border-color: rgba(80, 249, 97, 0.2);
     cursor: not-allowed;
 }
 
-/* Lock Overlay */
-.pass-lock-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.7);
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.8rem;
-    font-weight: 500;
-    white-space: nowrap;
+.day-pass-title {
+    font-family: "Fredericka the Great", serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white;
+    margin: 0px 0 1.5rem 0;
+    text-align: center;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.day-pass-features {
+    list-style: none;
+    padding: 0 1.5rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.day-pass-features li {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: left;
+    line-height: 1.4;
+}
+
+.day-pass-price {
+    font-family: "Fredericka the Great", serif;
+    font-size: 1.3rem;
+    color: rgb(80, 249, 97);
+    text-align: right;
+    padding: 0 1.5rem;
+    margin-top: auto;
+    margin-bottom: 1rem;
+}
+
+.day-pass-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0 1.5rem;
+}
+
+.day-pass-actions button {
+    flex: 1;
+    padding: 0.6rem 0;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-explore {
+    background: transparent;
+    color: white;
+    border-radius: 50px;
+}
+
+.btn-explore:active {
+    transform: scale(0.98);
+}
+
+.btn-select {
+    background: white;
+    color: black;
+    border-radius: 50px;
+}
+
+.btn-select.selected {
+    background: rgba(80, 249, 97, 0.2);
+    color: rgb(80, 249, 97);
+    border-color: rgba(80, 249, 97, 0.3);
+}
+
+.btn-select:active {
+    transform: scale(0.98);
 }
 
 /* ========================================
-   CHECKOUT SECTION
+   CHECKOUT BAR
    ======================================== */
-.checkout-section {
+.checkout-bar {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 1.5rem 2rem;
+    border-radius: 50px;
+    padding: 1rem 1.5rem;
+    margin-top: 2rem;
     animation: fadeInUp 0.3s ease-out;
 }
 
-.checkout-summary {
+.checkout-info {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    text-align: left;
+    gap: 2rem;
+    align-items: center;
 }
 
-.checkout-label {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.5);
+.checkout-count {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
 }
 
 .checkout-total {
-    font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.9);
+    font-family: "Fredericka the Great", serif;
+    font-size: 1.3rem;
+    color: rgb(80, 249, 97);
 }
 
-.checkout-total strong {
-    font-size: 1.5rem;
-    background: linear-gradient(135deg, #00d4ff, #00ff88);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.checkout-btn {
-    padding: 14px 32px;
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 255, 136, 0.2));
-    border: 1px solid rgba(0, 212, 255, 0.1);
-    border-radius: 24px;
-    color: white;
-    font-size: 1rem;
+.btn-checkout {
+    background: white;
+    color: black;
+    border: none;
+    border-radius: 50px;
+    padding: 0.75rem 2rem;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-
-.checkout-btn:active {
+.btn-checkout:active {
     transform: scale(0.98);
+}
+
+/* ========================================
+   REGISTRATION MODAL
+   ======================================== */
+.registration-modal {
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    overflow: hidden;
+    animation: slideUp 0.4s ease;
+}
+
+.registration-left {
+    width: 35%;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.registration-left h2 {
+    font-family: "Fredericka the Great", serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: white;
+    margin: 0 0 1rem 0;
+}
+
+.registration-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    margin: 0 0 2rem 0;
+    line-height: 1.5;
+}
+
+.registration-subtitle strong {
+    color: white;
+}
+
+.registration-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.registration-summary span:first-child {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+.registration-price {
+    font-family: "Fredericka the Great", serif;
+    font-size: 1.8rem;
+    color: rgb(80, 249, 97);
+}
+
+.registration-right {
+    width: 65%;
+    padding: 2.5rem;
+}
+
+.registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-group input {
+    padding: 0.85rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-submit {
+    margin-top: 0.75rem;
+    padding: 1rem;
+    background: white;
+    color: black;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-submit:active {
+    transform: scale(0.98);
+}
+
+.btn-submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Read-only fields */
+.readonly-field {
+    background: rgba(255, 255, 255, 0.02) !important;
+    cursor: not-allowed;
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.readonly-field.synapse-id {
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #00d4ff !important;
+}
+
+/* Government ID */
+.gov-id-group {
+    flex: 1;
+}
+
+.gov-id-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.gov-id-input-wrapper input {
+    flex: 1;
+    padding-right: 100px;
+    /* Space for badge */
+}
+
+.id-type-badge {
+    position: absolute;
+    right: 12px;
+    background: rgba(80, 249, 97, 0.15);
+    color: rgb(80, 249, 97);
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Terms checkbox */
+.terms-checkbox {
+    margin-top: 0.5rem;
+}
+
+.terms-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.terms-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: rgb(80, 249, 97);
+    cursor: pointer;
+}
+
+.terms-checkbox a {
+    color: #00d4ff;
+    text-decoration: none;
+}
+
+.terms-checkbox a:hover {
+    text-decoration: underline;
+}
+
+/* Registration messages */
+.registration-error {
+    background: rgba(255, 100, 100, 0.1);
+    border: 1px solid rgba(255, 100, 100, 0.3);
+    color: #ff6b6b;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.registration-success {
+    background: rgba(80, 249, 97, 0.1);
+    border: 1px solid rgba(80, 249, 97, 0.3);
+    color: rgb(80, 249, 97);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.btn-go-dashboard {
+    background: transparent;
+    color: #00d4ff;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: all 0.2s ease;
+}
+
+.btn-go-dashboard:hover {
+    background: rgba(0, 212, 255, 0.1);
+}
+
+/* ========================================
+   PAYMENT MODAL
+   ======================================== */
+.payment-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    animation: fadeIn 0.2s ease;
+}
+
+.payment-modal {
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    animation: slideUp 0.3s ease;
+}
+
+.payment-title {
+    font-family: "Fredericka the Great", serif;
+    font-size: 1.5rem;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+}
+
+.payment-amount {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.1rem;
+}
+
+.payment-amount strong {
+    color: rgb(80, 249, 97);
+    font-family: "Fredericka the Great", serif;
+    font-size: 1.4rem;
+}
+
+.payment-methods {
+    margin-bottom: 1.5rem;
+}
+
+.payment-methods label {
+    display: block;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+}
+
+.payment-method-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.payment-option {
+    flex: 1;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.payment-option.active {
+    background: rgba(80, 249, 97, 0.15);
+    border-color: rgba(80, 249, 97, 0.4);
+    color: rgb(80, 249, 97);
+}
+
+.payment-content {
+    margin-bottom: 1.5rem;
+}
+
+.upi-qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 16px;
+}
+
+.upi-qr-image {
+    width: 180px;
+    height: 180px;
+}
+
+.upi-scan-text {
+    color: #333;
+    font-size: 0.85rem;
+    margin: 1rem 0 0 0;
+    text-align: center;
+}
+
+.upi-note {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    margin: 0.75rem 0 0 0;
+    text-align: center;
+}
+
+.btn-open-app {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #5f27cd, #341f97);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-open-app:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(95, 39, 205, 0.4);
+}
+
+.already-paid-section {
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.already-paid-text {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.btn-enter-txn {
+    background: transparent;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-enter-txn:hover {
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.transaction-input-section {
+    margin-top: 1rem;
+}
+
+.transaction-error {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    margin: 0.5rem 0;
+}
+
+.transaction-hint {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+    margin: 0.5rem 0;
+}
+
+/* Enlarged QR */
+.upi-qr-container {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upi-qr-container.enlarged {
+    padding: 2rem;
+}
+
+.upi-qr-container.enlarged .upi-qr-image {
+    width: 280px;
+    height: 280px;
+}
+
+/* Send Request Button */
+.btn-send-request {
+    width: 100%;
+    padding: 0.85rem;
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.75rem;
+}
+
+.btn-send-request:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+}
+
+.btn-send-request:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Request Sent Message */
+.request-sent-message {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.request-sent-message .check-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: rgba(80, 249, 97, 0.15);
+    border-radius: 50%;
+    color: rgb(80, 249, 97);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.request-sent-message p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0.5rem 0;
+}
+
+.request-sent-message strong {
+    color: #00d4ff;
+}
+
+/* ========================================
+   IMAGE CONTAINER
+   ======================================== */
+.event-image-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+}
+
+.event-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+
+.event-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    pointer-events: none;
+}
+
+/* ========================================
+   MODAL OVERLAY
+   ======================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    /* Higher than everything */
+    padding: 2rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    max-width: 900px;
+    width: 100%;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    /* Horizontal layout */
+    position: relative;
+    animation: slideUp 0.4s ease;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0);
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s ease;
+}
+
+
+.modal-image {
+    width: 40%;
+    min-height: 450px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.modal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
+    mask-image: linear-gradient(to right, black 70%, transparent 100%);
+}
+
+.modal-body {
+    width: 60%;
+    padding: 2rem;
+    overflow-y: auto;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-title {
+    font-family: "Fredericka the Great", serif;
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: white;
+    margin: 0 0 0.5rem 0;
+}
+
+.modal-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+.modal-meta-left {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.modal-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 1);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.modal-location:hover {
+    color: #00d4ff;
+}
+
+.modal-location svg {
+    flex-shrink: 0;
+}
+
+.modal-sections-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.modal-section {
+    margin-bottom: 0;
+}
+
+.modal-section h3 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 0 0 0.75rem 0;
+}
+
+.modal-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.modal-section li {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.4;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-price {
+    font-family: "Fredericka the Great", serif;
+    font-size: 1.8rem;
+    color: rgb(80, 249, 97);
+}
+
+.modal-footer .btn-select {
+    padding: 0.75rem 2rem;
 }
 
 /* ========================================
@@ -403,16 +911,34 @@
     }
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* ========================================
    RESPONSIVE
    ======================================== */
 @media (max-width: 1024px) {
-    .day-passes-container {
+    .events-grid {
         gap: 1.25rem;
-    }
-
-    .day-pass-card {
-        padding: 1rem;
     }
 }
 
@@ -425,342 +951,67 @@
         font-size: 2.5rem;
     }
 
-    .events-subtitle {
-        font-size: 1.25rem;
-    }
-
-    .day-passes-container {
+    .events-grid {
         grid-template-columns: 1fr;
-        max-width: 350px;
-        margin: 0 auto 2rem;
+        max-width: 400px;
+        margin: 0 auto;
     }
 
-    .checkout-section {
+    .modal-overlay {
+        padding: 1rem;
+    }
+
+    .modal-content {
         flex-direction: column;
-        gap: 1rem;
-        text-align: center;
+        max-height: 90vh;
     }
 
-    .checkout-summary {
-        text-align: center;
-    }
-
-    .checkout-btn {
+    .modal-image {
         width: 100%;
+        min-height: 200px;
+        max-height: 200px;
+    }
+
+    .modal-body {
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        font-size: 2rem;
+    }
+
+    .modal-sections-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .registration-modal {
+        flex-direction: column;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .registration-left {
+        width: 100%;
+        padding: 1.5rem;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .registration-right {
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
     }
 }
+
 
 @media (max-width: 480px) {
     .events-title {
         font-size: 2rem;
-    }
-
-    .events-subtitle {
-        font-size: 1rem;
-    }
-
-    .events-info {
-        font-size: 0.9rem;
-    }
-
-    .pass-day-title {
-        font-size: 1.25rem;
-    }
-
-    .pass-event-item {
-        font-size: 0.85rem;
-    }
-}
-
-/* Loading State */
-.loading-state {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 50vh;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 1.25rem;
-}
-
-/* ========================================
-   REGISTRATION MODAL
-   ======================================== */
-.registration-modal__overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 1rem;
-}
-
-.registration-modal__content {
-    background: #1a1a1a;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    width: 100%;
-    max-width: 550px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* Header */
-.registration-modal__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 1.5rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.registration-modal__header h2 {
-    font-size: 1.35rem;
-    font-weight: 600;
-    color: white;
-    margin: 0;
-}
-
-.registration-modal__close {
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s ease;
-}
-
-.registration-modal__close:hover {
-    color: white;
-}
-
-/* Scrollable Body */
-.registration-modal__body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1.5rem;
-}
-
-/* Event Info Card */
-.registration-modal__event-card {
-    background: #252525;
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.event-card__info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.event-card__name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: white;
-}
-
-.event-card__date {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.event-card__price {
-    background: rgba(0, 200, 150, 0.15);
-    color: #00c896;
-    font-size: 0.9rem;
-    font-weight: 600;
-    padding: 0.4rem 0.75rem;
-    border-radius: 6px;
-}
-
-/* Sections */
-.registration-modal__section {
-    margin-bottom: 1.5rem;
-}
-
-.section-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 0 0 1rem 0;
-}
-
-/* Form Groups */
-.registration-modal__body .form-group {
-    margin-bottom: 1rem;
-}
-
-.registration-modal__body .form-group label {
-    display: block;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 0.5rem;
-}
-
-.registration-modal__body .form-group input {
-    width: 100%;
-    padding: 14px 16px;
-    background: #252525;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    color: white;
-    font-size: 0.95rem;
-    box-sizing: border-box;
-    transition: border-color 0.2s ease;
-}
-
-.registration-modal__body .form-group input:focus {
-    outline: none;
-    border-color: rgba(0, 200, 150, 0.5);
-}
-
-.registration-modal__body .form-group input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
-}
-
-.registration-modal__body .form-group input.readonly {
-    background: #1f1f1f;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: default;
-    border-color: transparent;
-}
-
-/* Form Row (side by side) */
-.registration-modal__body .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-/* Form Hint */
-.registration-modal__body .form-hint {
-    display: block;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.35);
-    margin-top: 0.5rem;
-}
-
-/* Terms Section */
-.registration-modal__terms {
-    margin-bottom: 0.5rem;
-}
-
-.registration-modal__terms .checkbox-label {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
-    line-height: 1.5;
-}
-
-.registration-modal__terms .checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    margin-top: 2px;
-    cursor: pointer;
-    accent-color: #00c896;
-    flex-shrink: 0;
-}
-
-.registration-modal__terms .checkbox-label a {
-    color: #00c896;
-    text-decoration: none;
-}
-
-.registration-modal__terms .checkbox-label a:hover {
-    text-decoration: underline;
-}
-
-/* Footer */
-.registration-modal__footer {
-    padding: 1rem 1.5rem 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* Error Message */
-.registration-modal__error {
-    background: rgba(255, 80, 80, 0.15);
-    border: 1px solid rgba(255, 80, 80, 0.3);
-    color: #ff6b6b;
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
-    text-align: center;
-}
-
-/* Submit Button - Gold/Yellow */
-.registration-modal__submit {
-    width: 100%;
-    padding: 16px 24px;
-    background: linear-gradient(135deg, #f5d742, #e6c02a);
-    border: none;
-    border-radius: 50px;
-    color: #1a1a1a;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.registration-modal__submit:hover:not(:disabled) {
-    background: linear-gradient(135deg, #ffe066, #f5d742);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(245, 215, 66, 0.3);
-}
-
-.registration-modal__submit:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-    .registration-modal__content {
-        max-height: 95vh;
-        border-radius: 12px;
-    }
-
-    .registration-modal__header {
-        padding: 1.25rem;
-    }
-
-    .registration-modal__header h2 {
-        font-size: 1.2rem;
-    }
-
-    .registration-modal__body {
-        padding: 1.25rem;
-    }
-
-    .registration-modal__body .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .registration-modal__footer {
-        padding: 1rem 1.25rem 1.25rem;
     }
 }

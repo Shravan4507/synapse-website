@@ -33,6 +33,7 @@ export interface Competition {
     color: string
     images?: string[]
     imageDisplayMode?: 'fill' | 'fit' | 'stretch' | 'tile' | 'centre'
+    imagePosition?: string // CSS object-position value (e.g., "center", "top", "bottom", "50% 30%")
     rules?: string
     venue?: string
     date?: string

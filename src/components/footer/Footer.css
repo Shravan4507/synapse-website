@@ -1,6 +1,7 @@
 .footer {
     position: relative;
-    z-index: 1;
+    z-index: 0;
+    /* Low z-index so modals appear above */
     background: rgba(0, 0, 0, 0);
     backdrop-filter: blur(20px);
     border-top: 0.8px solid rgba(255, 255, 255, 0.1);
