@@ -205,10 +205,12 @@ export default function Events() {
 
     const openModal = (day: DayPass) => {
         setSelectedDay(day)
+        document.body.classList.add('modal-open')
     }
 
     const closeModal = () => {
         setSelectedDay(null)
+        document.body.classList.remove('modal-open')
     }
 
     const toggleDaySelection = (dayId: number) => {

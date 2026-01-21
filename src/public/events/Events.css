@@ -460,7 +460,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1100;
+    z-index: 10000;
     animation: fadeIn 0.2s ease;
 }
 
@@ -736,8 +736,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
-    /* Higher than everything */
+    z-index: 9999;
+    /* Higher than everything including navbar */
     padding: 2rem;
     animation: fadeIn 0.3s ease;
 }
@@ -1013,5 +1013,16 @@
 @media (max-width: 480px) {
     .events-title {
         font-size: 2rem;
+    }
+}
+
+/* Mobile: Ensure modals appear above navbars */
+@media (max-width: 768px) {
+    .modal-overlay {
+        z-index: 99999 !important;
+    }
+
+    .payment-modal-overlay {
+        z-index: 100000 !important;
     }
 }
