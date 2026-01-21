@@ -36,13 +36,36 @@
     margin-bottom: 0.5rem;
 }
 
+/* Zeal Institutes Presents */
+.presents-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: -40px;
+    opacity: 0;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.zeal-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.presents-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+
 .hero-logo {
     width: 100%;
     max-width: 400px;
     height: auto;
     object-fit: contain;
     opacity: 0;
-    animation: logoFadeIn 0.5s ease-out forwards;
+    animation: logoFadeIn 0.5s ease-out 0.1s forwards;
 }
 
 @keyframes logoFadeIn {
@@ -101,11 +124,11 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .cta-btn.primary {
+    backdrop-filter: blur(20px);
     background: rgba(0, 0, 0, 0);
     color: #e4e4e4;
 }
@@ -116,6 +139,7 @@
 
 .cta-btn.secondary {
     background: rgba(255, 255, 255, 0);
+    backdrop-filter: blur(20px);
     color: #e4e4e4;
 }
 
@@ -295,16 +319,44 @@
 
     .hero-left {
         align-items: center;
-        order: 2;
+        order: 1;
     }
 
     .hero-center {
-        order: 1;
+        order: 2;
+    }
+
+    .hero-right {
+        display: flex !important;
+        order: 3;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .hero-card {
+        flex: 1;
+        min-width: 250px;
+        max-width: 300px;
     }
 
     .hero-branding {
         transform: scale(1.2);
         transform-origin: center center;
+    }
+
+    .presents-section {
+        justify-content: center;
+        margin-bottom: -15px;
+    }
+
+    .zeal-logo {
+        height: 35px;
+    }
+
+    .presents-text {
+        font-size: 1.1rem;
     }
 
     .brain-container {
@@ -333,6 +385,18 @@
         transform: scale(1);
     }
 
+    .zeal-logo {
+        height: 28px;
+    }
+
+    .presents-section {
+        margin-bottom: -10px;
+    }
+
+    .presents-text {
+        font-size: 0.95rem;
+    }
+
     .hero-logo {
         max-width: 200px;
     }
@@ -359,5 +423,14 @@
 
     .brain-container {
         max-width: 240px;
+    }
+
+    .hero-right {
+        flex-direction: column;
+    }
+
+    .hero-card {
+        min-width: 100%;
+        max-width: 100%;
     }
 }

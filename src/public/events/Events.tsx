@@ -152,7 +152,7 @@ export default function Events() {
     const [requestSent, setRequestSent] = useState(false)
 
     // Receiver UPI ID
-    const RECEIVER_UPI_ID = 'its.shravan.23-2@okaxis'
+    const RECEIVER_UPI_ID = 'shravan45x@pingpay'
     const RECEIVER_NAME = 'Synapse'
 
     // Already registered days (from previous registrations)

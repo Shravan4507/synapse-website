@@ -46,11 +46,39 @@
     flex-shrink: 0;
     width: 120px;
     /* Fixed width - logo size won't affect other elements */
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.navbar-logo:hover {
-    transform: scale(1.05);
+/* Combined Logos Container - Desktop */
+.navbar-logos {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+/* ZCOER Logo */
+.navbar-zcoer-logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.zcoer-logo-img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    transition: height 0.3s ease;
+}
+
+/* Mobile Synapse Logo - Hidden on desktop */
+.mobile-synapse-logo {
+    display: none;
+}
+
+.mobile-only {
+    display: none;
 }
 
 .navbar-logo-image {
@@ -268,6 +296,31 @@
 .mobile-menu-content {
     width: 90%;
     max-width: 400px;
+    position: relative;
+}
+
+.mobile-menu-close {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.mobile-menu-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
 }
 
 .mobile-menu-links {
@@ -335,23 +388,82 @@
 }
 
 /* Responsive Breakpoints */
-/* Mobile: ALWAYS show "scrolled" visual state with dark bg */
+/* Mobile: Scroll-aware behavior with proper logo sizing */
 @media (max-width: 768px) {
     .navbar-container {
-        height: 60px;
-        background: rgba(10, 10, 15, 0.98);
-        backdrop-filter: blur(12px);
+        height: 70px;
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        box-shadow: none;
+        border-bottom-color: transparent;
+    }
+
+    .navbar-container.scrolled {
+        height: 55px;
+        background: rgba(10, 10, 15, 0);
+        backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(12px);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         border-bottom-color: rgba(255, 255, 255, 0.05);
+        border-bottom-right-radius: 24px;
+        border-bottom-left-radius: 24px;
     }
 
     .navbar-inner {
         padding: 0 1rem;
+        justify-content: space-between;
+    }
+
+    /* Hide desktop logos container on mobile */
+    .navbar-logos {
+        display: none !important;
+    }
+
+    /* Show mobile-only elements */
+    .mobile-only {
+        display: flex !important;
+    }
+
+    /* Show mobile Synapse logo */
+    .mobile-synapse-logo {
+        display: flex !important;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        justify-content: center;
+    }
+
+    /* Mobile ZCOER logo */
+    .navbar-zcoer-logo.mobile-only {
+        display: flex !important;
+        flex-shrink: 0;
+    }
+
+    .zcoer-logo-img {
+        height: 32px;
+    }
+
+    .navbar-container.scrolled .zcoer-logo-img {
+        height: 28px;
+    }
+
+    /* Hide default navbar-logo on mobile (we use mobile-synapse-logo) */
+    .navbar-logo:not(.mobile-synapse-logo) {
+        display: none;
     }
 
     .navbar-logo-image {
-        height: 38px;
+        height: 55px !important;
+    }
+
+    .navbar-container.scrolled .navbar-logo-image {
+        height: 38px !important;
+    }
+
+    .navbar-container.scrolled .mobile-synapse-logo {
+        transform: translateX(-50%);
     }
 
     .desktop-only {
@@ -360,13 +472,22 @@
 
     .mobile-menu-toggle {
         display: flex;
-        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    body {
+        padding-bottom: 64px;
     }
 }
 
+
 @media (max-width: 480px) {
     .navbar-container {
-        height: 55px;
+        height: 60px;
+    }
+
+    .navbar-container.scrolled {
+        height: 50px;
     }
 
     .navbar-inner {
@@ -374,7 +495,11 @@
     }
 
     .navbar-logo-image {
-        height: 32px;
+        height: 45px !important;
+    }
+
+    .navbar-container.scrolled .navbar-logo-image {
+        height: 32px !important;
     }
 }
 
@@ -390,4 +515,110 @@
         padding: 0.875rem 1.5rem;
         font-size: 1rem;
     }
+}
+
+/* ========================================
+   MOBILE BOTTOM NAVIGATION BAR
+   ======================================== */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 54px;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    z-index: 100;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 0.5rem;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (max-width: 768px) {
+    .mobile-bottom-nav {
+        display: flex;
+    }
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    max-width: 80px;
+    height: 100%;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav-item:active {
+    transform: scale(0.9);
+}
+
+.bottom-nav-item.active {
+    color: #b300ff;
+}
+
+.bottom-nav-item.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.bottom-nav-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.bottom-nav-item.active .bottom-nav-icon {
+    stroke-width: 2;
+}
+
+/* Profile button in bottom nav */
+.bottom-nav-item.profile,
+.bottom-nav-item.login {
+    position: relative;
+}
+
+.bottom-nav-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+}
+
+.bottom-nav-item.profile.active .bottom-nav-avatar {
+    border-color: #00d4ff;
+}
+
+.bottom-nav-initial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.bottom-nav-item.profile.active .bottom-nav-initial {
+    border-color: #00d4ff;
+    color: #00d4ff;
 }

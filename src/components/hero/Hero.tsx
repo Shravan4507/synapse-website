@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import './Hero.css'
 import logo from '../../assets/logos/Logo Without Background - 2.png'
+import zealLogo from '../../assets/logos/Zeal Institutes-1.png'
 import neuralBrain from '/Neural Brain.png'
 
 export default function Hero() {
@@ -12,6 +13,11 @@ export default function Hero() {
                 {/* Left Content */}
                 <div className="hero-left">
                     <div className="hero-branding">
+                        {/* Zeal Institutes Presents */}
+                        <div className="presents-section">
+                            <img src={zealLogo} alt="Zeal Institutes" className="zeal-logo" />
+                            <span className="presents-text">presents</span>
+                        </div>
                         <img src={logo} alt="Synapse '26" className="hero-logo" />
                     </div>
 
